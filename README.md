@@ -40,7 +40,6 @@
 
 ### Structure du projet
 
-```text
 Health-IA-Frontend/
 ├── public/                 # Fichiers statiques (favicon, ressources SVG)
 ├── src/                    # Code source principal
