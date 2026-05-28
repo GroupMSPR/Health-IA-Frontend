@@ -1,73 +1,75 @@
-# React + TypeScript + Vite
+# 🏥 Health-IA-Frontend - Interface Web HealthAI Coach
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Frontend Web** de la plateforme HealthAI Coach, construit avec **React 19**, **TypeScript** et **Vite**. Cette application permet aux utilisateurs d'interagir avec la plateforme, de visualiser leurs tableaux de bord et de suivre leurs métriques de santé.
 
-Currently, two official plugins are available:
+![React](https://img.shields.io/badge/React-19-blue?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 📋 Table des matières
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [Vue d'ensemble](#vue-densemble)
+- [Architecture](#architecture)
+- [Stack technologique](#stack-technologique)
+- [Installation](#installation)
+- [Scripts disponibles](#scripts-disponibles)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [Documentation supplémentaire](#documentation-supplémentaire)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Vue d'ensemble
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+**Health-IA-Frontend** est l'interface utilisateur centrale de la plateforme HealthAI Coach. Elle offre une expérience fluide, moderne et réactive pour :
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- ✅ Naviguer dans l'application via une Single Page Application (SPA)
+- ✅ Visualiser les données et statistiques de santé (intégration de Recharts)
+- ✅ Interagir avec l'API Backend REST
+- ✅ Fournir une expérience utilisateur optimisée grâce à un stylisme sur-mesure (Tailwind CSS)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+**Point d'entrée recommandé** : Le repository [Health-IA-Workspace](https://github.com/GroupMSPR/Health-IA-Workspace) qui orchestre l'ensemble du projet.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Architecture
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Structure du projet
+
+```text
+Health-IA-Frontend/
+├── public/                 # Fichiers statiques (favicon, ressources SVG)
+├── src/                    # Code source principal
+│   ├── assets/             # Images et logos
+│   ├── styles/             # Feuilles de style (Tailwind, CSS global)
+│   ├── App.tsx             # Composant racine
+│   └── main.tsx            # Point d'entrée de l'application React
+├── docker-compose.yml      # Orchestration Docker locale
+├── Dockerfile              # Fichier de construction de l'image Docker
+├── eslint.config.js        # Configuration du linter
+├── index.html              # Template HTML principal
+├── package.json            # Dépendances et scripts npm
+├── postcss.config.js       # Configuration PostCSS (pour Tailwind)
+├── tailwind.config.js      # Configuration de Tailwind CSS
+├── tsconfig.*.json         # Configurations TypeScript (app, node)
+└── vite.config.ts          # Configuration du bundler Vite
+Stack technologiqueFrontendBibliothèque UI : React 19Langage : TypeScriptBundler / Dev Server : Vite 8Styling : Tailwind CSS 3.4 & PostCSSGraphiques & DataViz : Recharts 3.8Icônes : Lucide ReactOutils de QualitéLinter : ESLint 10 (Typage strict, React Hooks & Refresh)DevOpsContainerization : DockerOrchestration : Docker ComposeInstallationPrérequisNode.js 20+ (pour le développement local)npmDocker Desktop (recommandé pour l'environnement isolé)Déploiement avec Docker (Recommandé)Le projet est préconfiguré pour tourner dans un conteneur. Le port interne 5173 de Vite est exposé sur le port 5000 de votre machine hôte.Bash# 1. Cloner depuis le workspace (recommandé) ou directement le repo
+git clone [https://github.com/GroupMSPR/Health-IA-Frontend.git](https://github.com/GroupMSPR/Health-IA-Frontend.git)
+cd Health-IA-Frontend
+
+# 2. Lancer l'application via Docker Compose
+docker compose up -d
+L'application sera accessible sur : http://localhost:5000Installation locale (Sans Docker)Bash# 1. Cloner le repository
+git clone [https://github.com/GroupMSPR/Health-IA-Frontend.git](https://github.com/GroupMSPR/Health-IA-Frontend.git)
+cd Health-IA-Frontend
+
+# 2. Installer les dépendances
+npm install
+
+# 3. Lancer le serveur de développement
+npm run dev
+L'application sera accessible sur : http://localhost:5173Scripts disponiblesDans le répertoire du projet, vous pouvez exécuter les commandes suivantes :CommandeDescriptionnpm run devLance le serveur de développement Vite avec Hot Module Replacement (HMR).npm run buildCompile le TypeScript et construit l'application optimisée pour la production dans /dist.npm run lintAnalyse le code avec ESLint pour détecter les erreurs de syntaxe et de typage.npm run previewDémarre un serveur web local pour tester le build de production.ConfigurationConfiguration DockerLe fichier docker-compose.yml configure un service frontend optimisé pour le développement :Les fichiers locaux sont montés en tant que volumes (.:/app) permettant au Hot Reload de Vite de fonctionner à travers le conteneur.La variable d'environnement NODE_ENV=development est définie.Tailwind CSSLes styles utilitaires sont générés par Tailwind. Vous pouvez modifier le thème, les couleurs et les plugins dans le fichier tailwind.config.js.TroubleshootingLe Hot Reload ne fonctionne pas avec DockerProblème : Les modifications de code ne se reflètent pas dans le navigateur.Solution : Assurez-vous que la commande de démarrage expose bien le réseau local. Le fichier Dockerfile inclut déjà le flag --host (CMD ["npm", "run", "dev", "--", "--host"]), ce qui est indispensable avec Vite dans un conteneur.Erreur de port lors du lancement de DockerProblème : Bind for 0.0.0.0:5000 failed: port is already allocatedSolution : Le port 5000 est déjà utilisé par une autre application sur votre machine. Modifiez le port exposé dans docker-compose.yml (par exemple "5001:5173").📚 Documentation supplémentaireReact DocumentationVite DocumentationTailwind CSS DocumentationRecharts Documentation👥 ÉquipeDéveloppeurs MSPR : Ilan, Anthony, Diana🔗 LiensOrganization : GroupMSPRWorkspace : Health-IA-WorkspaceBackend : Health-IA-BackendETL : Health-IA-ETLFastAPI : Health-IA-FastAPIGrafana : Health-IA-GrafanaDernière mise à jour : 28 mai 2026
