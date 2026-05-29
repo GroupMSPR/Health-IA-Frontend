@@ -1,4 +1,4 @@
-# 🏥 Health-IA-Frontend - Interface Web HealthAI Coach
+# 🎨 Health-IA-Frontend - Interface Web HealthAI Coach
 
 **Frontend Web** de la plateforme HealthAI Coach, construit avec **React 19**, **TypeScript** et **Vite**. Cette application permet aux utilisateurs d'interagir avec la plateforme, de visualiser leurs tableaux de bord et de suivre leurs métriques de santé.
 
