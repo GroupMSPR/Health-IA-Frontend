@@ -1,0 +1,30 @@
+name: CI React (Lint + Build)
+
+on:
+  push:
+    branches: [ "master", "develop" ]
+  pull_request:
+    branches: [ "master", "develop" ]
+
+jobs:
+  build-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm' # Gère le cache des node_modules automatiquement
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Vérification du code (Lint)
+        run: npm run lint
+
+      - name: Compilation du projet (Build)
+        run: npm run build
