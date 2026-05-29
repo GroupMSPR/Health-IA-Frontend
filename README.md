@@ -3,7 +3,7 @@
 **Frontend Web** de la plateforme HealthAI Coach, construit avec **React 19**, **TypeScript** et **Vite**. Cette application permet aux utilisateurs d'interagir avec la plateforme, de visualiser leurs tableaux de bord et de suivre leurs métriques de santé.
 
 ![React](https://img.shields.io/badge/React-19-blue?logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?logo=tailwind-css&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
