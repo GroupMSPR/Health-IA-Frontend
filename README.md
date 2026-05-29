@@ -243,6 +243,12 @@ Développeurs MSPR :
 
 ---
 
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+---
+
 ## 🔗 Liens
 
 - **Organization** : GroupMSPR
@@ -254,4 +260,4 @@ Développeurs MSPR :
 
 ---
 
-Dernière mise à jour : 28 mai 2026
+Dernière mise à jour : 29 mai 2026
