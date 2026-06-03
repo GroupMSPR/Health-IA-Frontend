@@ -221,7 +221,7 @@ Modifiez le port exposé dans `docker-compose.yml` :
 
 ```yaml
 ports:
-  - "5002:5173"
+  - "5001:5173"
 ```
 
 ---
