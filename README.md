@@ -103,7 +103,7 @@ Health-IA-Frontend/
 ### Déploiement avec Docker (Recommandé)
 
 Le projet est préconfiguré pour tourner dans un conteneur.  
-Le port interne `5173` de Vite est exposé sur le port `5000` de votre machine hôte.
+Le port interne `5173` de Vite est exposé sur le port `5001` de votre machine hôte.
 
 ```bash
 # 1. Cloner depuis le workspace (recommandé)
@@ -120,7 +120,7 @@ docker compose up -d
 L'application sera accessible sur :
 
 ```txt
-http://localhost:5000
+http://localhost:5001
 ```
 
 ---
@@ -215,7 +215,7 @@ Bind for 0.0.0.0:5000 failed: port is already allocated
 
 #### Solution
 
-Le port `5000` est déjà utilisé par une autre application sur votre machine.
+Le port `5001` est déjà utilisé par une autre application sur votre machine.
 
 Modifiez le port exposé dans `docker-compose.yml` :
 
