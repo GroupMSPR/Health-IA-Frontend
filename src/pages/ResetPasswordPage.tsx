@@ -14,11 +14,31 @@ export default function ResetPassword() {
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [globalError, setGlobalError] = useState('');
 
+    const [isExpired, setIsExpired] = useState(false);
+    const [countdown, setCountdown] = useState(5);
+
     const [formData, setFormData] = useState({
         email: emailFromUrl || '',
         password: '',
         password_confirmation: '',
     });
+
+    useEffect(() => {
+        if (isExpired) {
+            const timer = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
+
+            const redirect = setTimeout(() => {
+                navigate('/login');
+            }, 5000);
+
+            return () => {
+                clearInterval(timer);
+                clearTimeout(redirect);
+            };
+        }
+    }, [isExpired, navigate]);
 
     useEffect(() => {
         if (!token) {
@@ -52,8 +72,14 @@ export default function ResetPassword() {
             });
             
         } catch (err) {
-            if (isAxiosError(err) && err.response?.status === 422) {
-                setErrors(err.response.data.errors);
+            if (isAxiosError(err) && (err.response?.status === 422 || err.response?.status === 400)) {
+                
+                if (err.response.status === 400) {
+                    setIsExpired(true);
+                } else {
+                    setErrors(err.response.data.errors || {});
+                }
+
             } else if (isAxiosError(err) && err.response?.data?.message) {
                 setGlobalError(err.response.data.message);
             } else {
@@ -65,6 +91,37 @@ export default function ResetPassword() {
     };
 
     if (!token) return null;
+
+    if (isExpired) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+                <div className="max-w-md w-full bg-white p-10 rounded-2xl shadow-xl border border-slate-100 text-center space-y-6">
+                    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100">
+                        <svg className="h-8 w-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-extrabold text-slate-900 mb-2">Lien expiré</h2>
+                        <p className="text-slate-500">
+                            Vous ne pouvez plus réinitialiser votre mot de passe via ce lien.
+                        </p>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-xl">
+                        <p className="text-sm font-medium text-slate-700">
+                            Redirection vers la page de connexion dans <span className="text-blue-600 text-lg font-bold mx-1">{countdown}</span> secondes...
+                        </p>
+                    </div>
+                    <button 
+                        onClick={() => navigate('/login')}
+                        className="w-full py-3 px-4 rounded-xl text-blue-700 font-bold bg-blue-50 hover:bg-blue-100 transition-colors"
+                    >
+                        Aller au login maintenant
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -90,7 +147,7 @@ export default function ResetPassword() {
                             type="email"
                             value={formData.email}
                             readOnly
-                            className="w-full border border-slate-200 bg-slate-50 text-slate-500 rounded-lg p-2.5 cursor-not-allowed"
+                            className="w-full border border-slate-200 bg-slate-50 text-slate-500 rounded-lg p-2.5 cursor-not-allowed outline-none"
                         />
                     </div>
 
@@ -100,10 +157,10 @@ export default function ResetPassword() {
                             name="password"
                             type="password"
                             required
-                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-shadow"
                             onChange={handleChange}
                         />
-                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password[0]}</p>}
+                        {errors.password && <p className="text-red-500 text-xs mt-1 font-medium">{errors.password[0]}</p>}
                     </div>
 
                     <div>
@@ -112,7 +169,7 @@ export default function ResetPassword() {
                             name="password_confirmation"
                             type="password"
                             required
-                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none transition-shadow"
                             onChange={handleChange}
                         />
                     </div>
@@ -123,7 +180,7 @@ export default function ResetPassword() {
                             disabled={isSubmitting}
                             className="w-full flex justify-center py-3 px-4 rounded-xl text-white font-bold bg-blue-600 hover:bg-blue-700 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
                         >
-                            {isSubmitting ? 'Sauvegarde...' : 'Enregistrer'}
+                            {isSubmitting ? 'Sauvegarde en cours...' : 'Enregistrer'}
                         </button>
                     </div>
                 </form>
