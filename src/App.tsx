@@ -5,9 +5,8 @@ import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
 import ForgotPassword from './pages/ForgotPasswordPage';
 import ResetPassword from './pages/ResetPasswordPage';
-
-
-const Dashboard = () => <div className="p-8 text-center text-2xl font-bold text-green-600">Tableau de bord super sécurisé ! 🔒</div>;
+import DashboardLayout from './layouts/DashboardLayout';
+import DashboardPage from './pages/DashboardPage';
 
 export default function App() {
   return (
@@ -15,14 +14,17 @@ export default function App() {
       <BrowserRouter>
         <Routes>
 
-          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
+          <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route element={<DashboardLayout />}>
+
+              <Route path="/dashboard" element={<DashboardPage />} />
+              
+            </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
