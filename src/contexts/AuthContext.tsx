@@ -9,17 +9,11 @@ interface User {
     email: string;
 }
 
-interface LoginCredentials {
-    email: string;
-    password?: string;
-    [key: string]: string | undefined;
-}
-
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (credentials: LoginCredentials) => Promise<void>;
+    login: (userData: User) => void;
     logout: () => Promise<void>;
     checkAuth: () => Promise<void>;
 }
@@ -33,7 +27,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkAuth = useCallback(async () => {
         try {
             const response = await axios.get('/api/user/me');
-            setUser(response.data);
+
+            setUser(response.data.user);
+            
         } catch (error) {
             console.error("Non authentifié :", error);
             setUser(null);
@@ -56,10 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initializeAuth();
     }, [checkAuth]);
 
-    const login = async (credentials: LoginCredentials) => {
-        await axios.get('/sanctum/csrf-cookie');
-        await axios.post('/api/login', credentials);
-        await checkAuth();
+    const login = (userData: User) => {
+        setUser(userData);
     };
 
     const logout = async () => {
