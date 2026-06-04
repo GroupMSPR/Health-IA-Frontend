@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkAuth = useCallback(async () => {
         try {
-            const response = await axios.get('/api/user');
+            const response = await axios.get('/api/user/me');
             setUser(response.data);
         } catch (error) {
             console.error("Non authentifié :", error);
