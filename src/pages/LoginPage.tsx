@@ -68,7 +68,7 @@ export default function LoginPage() {
         <main className="min-h-screen flex flex-col lg:flex-row bg-slate-50 font-sans">
             
             {/* ================= SECTION GAUCHE / HAUT (PRÉSENTATION) ================= */}
-            <section className="bg-blue-600 text-white lg:w-1/2 flex flex-col justify-center px-6 py-12 lg:p-20 relative overflow-hidden">
+            <section className="bg-gradient-to-br from-[#4A6BF0] to-[#7B3FF2] text-white lg:w-1/2 flex flex-col justify-center px-6 py-12 lg:p-20 relative overflow-hidden">
                 <div className="absolute top-8 left-6 lg:top-12 lg:left-12 flex items-center gap-3">
                     <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
                         <Activity className="h-6 w-6 text-white" aria-hidden="true" />
@@ -78,21 +78,21 @@ export default function LoginPage() {
 
                 {/* Mobile / Tablette */}
                 <div className="mt-12 lg:hidden text-center sm:text-left">
-                    <h1 className="text-3xl font-extrabold mb-2 text-white">Welcome back!</h1>
-                    <p className="text-blue-50 text-sm sm:text-base mb-8">Sign in to continue your journey</p>
+                    <h1 className="text-3xl font-extrabold mb-2 text-white">Ravi de vous revoir !</h1>
+                    <p className="text-blue-50 text-sm sm:text-base mb-8">Connectez-vous pour continuer votre aventure sportive.</p>
                     
                     <div className="hidden sm:flex gap-4 mb-4">
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm flex-1 text-center border border-white/10">
                             <div className="text-2xl font-bold text-white">10K+</div>
-                            <div className="text-xs text-blue-50">Users</div>
+                            <div className="text-xs text-blue-50">Participants</div>
                         </div>
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm flex-1 text-center border border-white/10">
                             <div className="text-2xl font-bold text-white">500+</div>
-                            <div className="text-xs text-blue-50">Workouts</div>
+                            <div className="text-xs text-blue-50">Exercices</div>
                         </div>
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm flex-1 text-center border border-white/10">
                             <div className="text-2xl font-bold text-white">95%</div>
-                            <div className="text-xs text-blue-50">Success</div>
+                            <div className="text-xs text-blue-50">Satisfaction</div>
                         </div>
                     </div>
                 </div>
@@ -100,10 +100,10 @@ export default function LoginPage() {
                 {/* Desktop */}
                 <div className="hidden lg:block mt-20 max-w-lg">
                     <h1 className="text-5xl font-extrabold leading-tight mb-6 text-white">
-                        Your Personal<br />AI Fitness<br />Coach
+                        Votre Coach<br />Fitness Personnel<br />Boosté par IA
                     </h1>
                     <p className="text-lg text-white mb-10 leading-relaxed">
-                        Track progress & achieve your fitness goals<br />with AI-powered coaching.
+                        Suivez vos progrès et atteignez vos objectifs<br />grâce à un coaching propulsé par l'IA.
                     </p>
 
                     <ul className="space-y-4 mb-16">
@@ -111,19 +111,19 @@ export default function LoginPage() {
                             <div className="bg-white/20 rounded-md p-1">
                                 <Check className="h-4 w-4 text-white" aria-hidden="true" />
                             </div>
-                            <span className="text-white font-medium">AI-powered personalized plans</span>
+                            <span className="text-white font-medium">Programmes personnalisés par l'IA</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <div className="bg-white/20 rounded-md p-1">
                                 <Check className="h-4 w-4 text-white" aria-hidden="true" />
                             </div>
-                            <span className="text-white font-medium">Smart goal tracking & insights</span>
+                            <span className="text-white font-medium">Suivi intelligent des objectifs & conseils</span>
                         </li>
                         <li className="flex items-center gap-3">
                             <div className="bg-white/20 rounded-md p-1">
                                 <Check className="h-4 w-4 text-white" aria-hidden="true" />
                             </div>
-                            <span className="text-white font-medium">Real-time progress analytics</span>
+                            <span className="text-white font-medium">Statistiques de progression en temps réel</span>
                         </li>
                     </ul>
 
@@ -131,17 +131,17 @@ export default function LoginPage() {
                         <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md flex-1 border border-white/10 shadow-xl">
                             <div className="flex justify-center mb-2"><Users className="h-6 w-6 text-blue-50" /></div>
                             <div className="text-2xl font-bold text-center text-white">10K+</div>
-                            <div className="text-xs text-center text-blue-50 font-medium mt-1">Active Users</div>
+                            <div className="text-xs text-center text-blue-50 font-medium mt-1">Utilisateurs actifs</div>
                         </div>
                         <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md flex-1 border border-white/10 shadow-xl">
                             <div className="flex justify-center mb-2"><Activity className="h-6 w-6 text-blue-50" /></div>
                             <div className="text-2xl font-bold text-center text-white">500+</div>
-                            <div className="text-xs text-center text-blue-50 font-medium mt-1">Workouts</div>
+                            <div className="text-xs text-center text-blue-50 font-medium mt-1">Entraînements</div>
                         </div>
                         <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md flex-1 border border-white/10 shadow-xl">
                             <div className="flex justify-center mb-2"><Trophy className="h-6 w-6 text-blue-50" /></div>
                             <div className="text-2xl font-bold text-center text-white">95%</div>
-                            <div className="text-xs text-center text-blue-50 font-medium mt-1">Success</div>
+                            <div className="text-xs text-center text-blue-50 font-medium mt-1">Satisfaction</div>
                         </div>
                     </div>
                 </div>
@@ -152,8 +152,8 @@ export default function LoginPage() {
                 <div className="w-full max-w-md bg-transparent rounded-3xl lg:rounded-none shadow-xl lg:shadow-none p-8 sm:p-10 lg:p-0">
                     
                     <div className="hidden lg:block mb-10">
-                        <h2 className="text-3xl font-bold text-slate-900">Welcome back</h2>
-                        <p className="text-slate-500 mt-2">Sign in to continue your fitness journey</p>
+                        <h2 className="text-3xl font-bold text-slate-900">Ravi de vous revoir !</h2>
+                        <p className="text-slate-500 mt-2">Connectez-vous pour continuer votre aventure sportive.</p>
                     </div>
 
                     {globalError && (
@@ -169,7 +169,7 @@ export default function LoginPage() {
                     <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         <div>
                             <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
-                                Email address
+                                Email
                             </label>
                             <input
                                 id="email"
@@ -184,7 +184,7 @@ export default function LoginPage() {
                                 className={`w-full px-4 py-3 rounded-xl border outline-none transition-all ${
                                     errors.email 
                                     ? 'border-red-300 focus:ring-2 focus:ring-red-200 bg-red-50' 
-                                    : 'border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 bg-slate-50/50 hover:bg-slate-50'
+                                    : 'border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-slate-200 bg-slate-50/50 hover:bg-slate-50'
                                 }`}
                                 placeholder="alex@example.com"
                             />
@@ -197,7 +197,7 @@ export default function LoginPage() {
 
                         <div>
                             <label htmlFor="password" className="block text-sm font-semibold text-slate-700 mb-2">
-                                Password
+                                Mot de passe
                             </label>
                             <input
                                 id="password"
@@ -212,7 +212,7 @@ export default function LoginPage() {
                                 className={`w-full px-4 py-3 rounded-xl border outline-none transition-all tracking-widest ${
                                     errors.password 
                                     ? 'border-red-300 focus:ring-2 focus:ring-red-200 bg-red-50' 
-                                    : 'border-slate-200 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 bg-slate-50/50 hover:bg-slate-50'
+                                    : 'border-slate-200 focus:border-slate-300 focus:ring-2 focus:ring-slate-200 bg-slate-50/50 hover:bg-slate-50'
                                 }`}
                                 placeholder="••••••••"
                             />
@@ -231,15 +231,15 @@ export default function LoginPage() {
                                     type="checkbox"
                                     checked={formData.remember}
                                     onChange={handleChange}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer"
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded border-radius-lg cursor-pointer"
                                 />
                                 <label htmlFor="remember" className="ml-2 block text-sm text-slate-600 cursor-pointer select-none">
-                                    Remember me
+                                    Se souvenir de moi
                                 </label>
                             </div>
                             <div className="text-sm">
                                 <Link to="/forgot-password" className="font-semibold text-blue-600 hover:text-blue-500">
-                                    Forgot password?
+                                    Mot de passe oublié?
                                 </Link>
                             </div>
                         </div>
@@ -256,10 +256,10 @@ export default function LoginPage() {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    Signing in...
+                                    Connexion en cours...
                                 </span>
                             ) : (
-                                "Sign In"
+                                "Se connecter"
                             )}
                         </button>
                     </form>
@@ -270,7 +270,7 @@ export default function LoginPage() {
                                 <div className="w-full border-t border-slate-200" />
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-4 bg-white text-slate-500 font-medium">or continue with</span>
+                                <span className="px-4 bg-white text-slate-500 font-medium">ou continuer avec</span>
                             </div>
                         </div>
 
@@ -314,9 +314,9 @@ export default function LoginPage() {
                     </div>
 
                     <p className="mt-8 text-sm text-slate-600 sm:text-center lg:text-left">
-                        Don't have an account?{' '}
+                        Tu as déjà un compte?{' '}
                         <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
-                            Sign up for free
+                            S'inscrire gratuitement
                         </Link>
                     </p>
                 </div>
