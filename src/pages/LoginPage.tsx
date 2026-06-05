@@ -264,7 +264,7 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-14"> 
+                    <div className="mt-6"> 
                         <div className="mt-6 relative">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-slate-200" />
@@ -279,7 +279,7 @@ export default function LoginPage() {
                                 type="button"
                                 className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
                             >
-                                <img src="/google-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <img src="/social-networks/google-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
                                 <span className="hidden sm:inline">Google</span>
                                 <span className="sm:hidden">Google</span>
                             </button>
@@ -288,28 +288,78 @@ export default function LoginPage() {
                                 type="button"
                                 className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
                             >
-                                <img src="/github-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
-                                <span className="hidden sm:inline">GitHub</span>
-                                <span className="sm:hidden">GitHub</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
-                            >
-                                <img src="/apple-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
-                                <span className="hidden sm:inline">Apple</span>
-                                <span className="sm:hidden">Apple</span>
-                            </button>
-
-                            <button
-                                type="button"
-                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
-                            >
-                                <img src="/microsoft-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <img src="/social-networks/microsoft-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
                                 <span className="hidden sm:inline">Microsoft</span>
                                 <span className="sm:hidden">MS</span>
                             </button>
+
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
+                            >
+                                <img src="/social-networks/apple-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <span className="hidden sm:inline">Apple</span>
+                                <span className="sm:hidden">Apple</span>
+                            </button>
+                            
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
+                            >
+                                <img src="/social-networks/facebook-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <span className="hidden sm:inline">Facebook</span>
+                                <span className="sm:hidden">FB</span>
+                            </button>
+                            
+                        </div>
+
+                        <div className="mt-6 relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <div className="w-full border-t border-slate-200" />
+                            </div>
+                            <div className="relative flex justify-center text-sm">
+                                {/* <span className="px-4 bg-slate-50 text-slate-500 font-medium">ou continuer avec</span> */}
+                            </div>
+                        </div>
+
+                        <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
+                            >
+                                <img src="/social-networks/strava-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <span className="hidden sm:inline">Strava</span>
+                                <span className="sm:hidden">Strava</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
+                            >
+                                <img src="/social-networks/garmin-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <span className="hidden sm:inline">Garmin</span>
+                                <span className="sm:hidden">Garmin</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
+                            >
+                                <img src="/social-networks/fitbit-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <span className="hidden sm:inline">FitBit</span>
+                                <span className="sm:hidden">FitBit</span>
+                            </button>
+
+                            <button
+                                type="button"
+                                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 border border-slate-200 rounded-xl shadow-sm bg-white text-sm font-semibold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-colors"
+                            >
+                                <img src="/social-networks/nike-icon.svg" alt="" aria-hidden="true" className="w-5 h-5" />
+                                <span className="hidden sm:inline">Nike</span>
+                                <span className="sm:hidden">Nike</span>
+                            </button>
+
                         </div>
                     </div>
 
