@@ -264,13 +264,13 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <div className="mt-8">
-                        <div className="relative">
+                    <div className="mt-14"> 
+                        <div className="mt-6 relative">
                             <div className="absolute inset-0 flex items-center">
                                 <div className="w-full border-t border-slate-200" />
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-4 bg-white text-slate-500 font-medium">ou continuer avec</span>
+                                <span className="px-4 bg-slate-50 text-slate-500 font-medium">ou continuer avec</span>
                             </div>
                         </div>
 

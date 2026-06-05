@@ -5,7 +5,7 @@ import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
 import ForgotPassword from './pages/ForgotPasswordPage';
 import ResetPassword from './pages/ResetPasswordPage';
-import DashboardLayout from './layouts/DashboardLayout';
+import MainLayout from './layouts/MainLayout';
 import DashboardPage from './pages/DashboardPage';
 
 export default function App() {
@@ -20,7 +20,7 @@ export default function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route element={<DashboardLayout />}>
+            <Route element={<MainLayout />}>
 
               <Route path="/dashboard" element={<DashboardPage />} />
               

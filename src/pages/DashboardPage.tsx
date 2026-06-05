@@ -1,5 +1,5 @@
 import { useAuth } from '../contexts/AuthContext';
-import { Activity, Flame, Dumbbell, Target, TrendingUp, Clock, Zap, Camera, BookOpen, Apple, ChevronRight } from 'lucide-react';
+import { Activity, Flame, Dumbbell, Target, TrendingUp, Clock, Zap, Camera, Apple, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
   Chart as ChartJS,
@@ -177,7 +177,7 @@ export default function DashboardPage() {
 
                     <Link to="/exercises" className="flex-1 bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all group flex items-center gap-4">
                         <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 group-hover:scale-110 transition-transform">
-                            <BookOpen className="h-7 w-7" strokeWidth={2} />
+                            <Dumbbell className="h-7 w-7" strokeWidth={2} />
                         </div>
                         <div>
                             <h3 className="font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors">Bibliothèque d'exercices</h3>
