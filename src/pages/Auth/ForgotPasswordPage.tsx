@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from '../lib/axios';
+import axios from '../../lib/axios';
 import { isAxiosError } from 'axios';
 import { Activity } from 'lucide-react';
 

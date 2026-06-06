@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from '../lib/axios';
-import { useAuth } from '../contexts/AuthContext';
+import axios from '../../lib/axios';
+import { useAuth } from '../../contexts/AuthContext';
 import { isAxiosError } from 'axios';
 import { Check, Activity, Users, Trophy } from 'lucide-react';
 

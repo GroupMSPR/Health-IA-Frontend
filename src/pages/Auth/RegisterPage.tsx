@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from '../lib/axios';
+import axios from '../../lib/axios';
 import { isAxiosError } from 'axios';
 import { Activity } from 'lucide-react';
 
@@ -123,7 +123,6 @@ export default function Register() {
             <section className="flex-1 flex justify-center p-4 sm:p-8 lg:p-12 lg:ml-[40%] xl:ml-[35%] relative z-10 -mt-8 sm:-mt-12 lg:mt-0">
                 <div className="w-full max-w-3xl bg-white rounded-3xl lg:rounded-none shadow-xl lg:shadow-none p-6 sm:p-10 lg:p-4">
                     
-                    {/* Titre Desktop */}
                     <div className="hidden lg:block mb-10">
                         <h2 className="text-3xl font-bold text-slate-900">Créer votre compte</h2>
                         <p className="text-slate-500 mt-2">Créez votre profil de santé personnalisé.</p>
@@ -218,9 +217,9 @@ export default function Register() {
                                         value={formData.gender} onChange={handleChange}
                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none transition-all focus:border-slate-300 focus:ring-2 focus:ring-slate-200 bg-white hover:bg-slate-50"
                                     >
-                                        <option value="male">Homme</option>
-                                        <option value="female">Femme</option>
-                                        <option value="other">Autre</option>
+                                        <option value="Homme">Homme</option>
+                                        <option value="Femme">Femme</option>
+                                        <option value="Autre">Autre</option>
                                     </select>
                                 </div>
                                 

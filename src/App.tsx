@@ -1,12 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/LoginPage';
-import Register from './pages/RegisterPage';
-import ForgotPassword from './pages/ForgotPasswordPage';
-import ResetPassword from './pages/ResetPasswordPage';
+import Login from './pages/Auth/LoginPage';
+import Register from './pages/Auth/RegisterPage';
+import ForgotPassword from './pages/Auth/ForgotPasswordPage';
+import ResetPassword from './pages/Auth/ResetPasswordPage';
 import MainLayout from './layouts/MainLayout';
 import DashboardPage from './pages/DashboardPage';
+import ExercisesMainPage from './pages/Exercises/ExercisesMainPage';
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
             <Route element={<MainLayout />}>
 
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/exercises" element={<ExercisesMainPage />} />
               
             </Route>
           </Route>

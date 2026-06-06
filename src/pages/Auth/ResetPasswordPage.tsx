@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import axios from '../lib/axios';
+import axios from '../../lib/axios';
 import { isAxiosError } from 'axios';
 import { Activity } from 'lucide-react';
 
