@@ -26,7 +26,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkAuth = useCallback(async () => {
         try {
-            const response = await axios.get('/api/user/me');
+            const response = await axios.get('/api/current-user');
 
             setUser(response.data.user);
             

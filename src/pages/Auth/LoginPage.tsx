@@ -83,7 +83,7 @@ export default function LoginPage() {
                     
                     <div className="hidden sm:flex gap-4 mb-4">
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm flex-1 text-center border border-white/10">
-                            <div className="text-2xl font-bold text-white">10K+</div>
+                            <div className="text-2xl font-bold text-white">50K+</div>
                             <div className="text-xs text-blue-50">Participants</div>
                         </div>
                         <div className="bg-white/10 p-4 rounded-xl backdrop-blur-sm flex-1 text-center border border-white/10">
@@ -130,7 +130,7 @@ export default function LoginPage() {
                     <div className="flex gap-6">
                         <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md flex-1 border border-white/10 shadow-xl">
                             <div className="flex justify-center mb-2"><Users className="h-6 w-6 text-blue-50" /></div>
-                            <div className="text-2xl font-bold text-center text-white">10K+</div>
+                            <div className="text-2xl font-bold text-center text-white">50K+</div>
                             <div className="text-xs text-center text-blue-50 font-medium mt-1">Utilisateurs actifs</div>
                         </div>
                         <div className="bg-white/10 p-5 rounded-2xl backdrop-blur-md flex-1 border border-white/10 shadow-xl">
