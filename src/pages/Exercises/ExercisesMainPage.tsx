@@ -16,6 +16,7 @@ import {
     SlidersHorizontal 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import axios from '../../lib/axios';
 
 interface Exercise {
@@ -61,7 +62,6 @@ export default function ExercisesMainPage() {
     const [globalTotal, setGlobalTotal] = useState<number | null>(null);
     const itemsPerPage = 10;
 
-    // 1. Debounce de la recherche textuelle
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(searchQuery);
@@ -70,7 +70,6 @@ export default function ExercisesMainPage() {
         return () => clearTimeout(timer);
     }, [searchQuery]);
 
-    // 2. Récupération du compteur global via la route dédiée (Fixe et indépendant des filtres)
     useEffect(() => {
         const fetchGlobalTotal = async () => {
             try {
@@ -84,7 +83,6 @@ export default function ExercisesMainPage() {
         fetchGlobalTotal();
     }, [reloadKey]);
 
-    // 3. Récupération des exercices (Filtres, Tri et Pagination via Lomkit)
     useEffect(() => {
         const fetchExercises = async () => {
             setIsLoading(true);
@@ -96,7 +94,6 @@ export default function ExercisesMainPage() {
                     apiFilters.push({ field: 'category', operator: '=', value: activeFilter });
                 }
                 if (debouncedSearch) {
-                    // Utilisation stricte de 'like' pour ne pas déclencher la 422 de Lomkit
                     apiFilters.push({ field: 'name', operator: 'like', value: `%${debouncedSearch}%` });
                 }
 
@@ -124,11 +121,14 @@ export default function ExercisesMainPage() {
                 }
             } catch (err: any) {
                 console.error("Erreur récupération exercices:", err);
+                let msg = "Impossible de charger le catalogue d'exercices. Vérifiez la connexion.";
+                
                 if (err.response?.status === 401) {
-                    setError("Votre session a expiré ou est introuvable. Veuillez vous reconnecter.");
-                } else {
-                    setError("Impossible de charger le catalogue d'exercices. Vérifiez la connexion avec le serveur.");
+                    msg = "Votre session a expiré. Veuillez vous reconnecer.";
                 }
+                
+                setError(msg);
+                toast.error(msg);
             } finally {
                 setIsLoading(false);
             }
@@ -147,7 +147,6 @@ export default function ExercisesMainPage() {
         setCurrentPage(1);
     };
 
-    // --- LOGIQUE DE SÉLECTION ORIGINALE ET FONCTIONNELLE ---
     const toggleSelectMode = () => {
         setIsSelectMode(!isSelectMode);
         setSelectedIds([]);
@@ -169,16 +168,20 @@ export default function ExercisesMainPage() {
         if (selectedIds.length === 0) return;
         if (!window.confirm(`Supprimer les ${selectedIds.length} exercice(s) sélectionné(s) ?`)) return;
 
+        const countDeleted = selectedIds.length;
+
         try {
-            // Requête Delete conforme aux attentes de Lomkit/Rest
             await axios.delete('/api/exercises', { data: { resources: selectedIds } });
             
             setSelectedIds([]);
             setIsSelectMode(false);
-            setReloadKey(k => k + 1); // Déclenche un nouveau fetch global
+            setReloadKey(k => k + 1);
+            
+            toast.success(`${countDeleted} exercice(s) supprimé(s) avec succès !`);
         } catch (err) {
             console.error('Erreur suppression:', err);
             setError("Impossible de supprimer les exercices sélectionnés.");
+            toast.error("Impossible de supprimer les exercices sélectionnés. Veuillez réessayer.");
         }
     };
 

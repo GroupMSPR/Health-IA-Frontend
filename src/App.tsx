@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Auth/LoginPage';
@@ -14,6 +15,8 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+
+          <Toaster position="bottom-right" richColors closeButton />
 
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
