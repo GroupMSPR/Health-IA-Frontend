@@ -243,7 +243,7 @@ export default function ExercisesMainPage() {
                         <span className="hidden sm:inline">{isSelectMode ? 'Annuler' : 'Sélection'}</span>
                     </button>
 
-                    <Link to="/exercises/create" className="flex items-center justify-center bg-[#7B3FF2] hover:bg-[#6830d1] text-white transition-colors sm:px-4 sm:py-2.5 rounded-xl w-10 h-10 sm:w-auto sm:h-auto shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] focus-visible:ring-offset-2">
+                    <Link to="/exercise/create" className="flex items-center justify-center bg-[#7B3FF2] hover:bg-[#6830d1] text-white transition-colors sm:px-4 sm:py-2.5 rounded-xl w-10 h-10 sm:w-auto sm:h-auto shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] focus-visible:ring-offset-2">
                         <Plus className="h-5 w-5 sm:mr-2" aria-hidden="true" />
                         <span className="hidden sm:inline font-bold text-sm">Ajouter un exercice</span>
                     </Link>
@@ -349,7 +349,7 @@ export default function ExercisesMainPage() {
                                         </button>
                                     ) : (
                                         <Link 
-                                            to={`/exercises/${exercise.id}`}
+                                            to={`/exercise/${exercise.id}`}
                                             aria-label={`Voir les détails de l'exercice ${exercise.name}`}
                                             className="block h-full bg-white p-4 sm:p-5 rounded-2xl border-2 border-slate-100 shadow-sm hover:shadow-md hover:border-[#7B3FF2] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] focus-visible:ring-offset-2"
                                         >
