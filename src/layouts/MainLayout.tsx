@@ -41,7 +41,7 @@ export default function MainLayout() {
         { name: "Exercises", path: "/exercises", icon: Dumbbell },
         { name: "Scan", path: "/food/scan", icon: Camera, isPrimary: true },
         { name: "Foods", path: "/foods", icon: Apple },
-        { name: "Profile", path: "/profile", icon: User },
+        { name: "Profile", path: "/account/profile", icon: User },
     ];
 
     const userInitials = user 
