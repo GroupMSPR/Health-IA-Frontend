@@ -60,7 +60,7 @@ export default function ExercisesMainPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [globalTotal, setGlobalTotal] = useState<number | null>(null);
-    const itemsPerPage = 10;
+    const itemsPerPage = 25;
 
     useEffect(() => {
         const timer = setTimeout(() => {

@@ -196,7 +196,7 @@ export default function ExerciseDetailPage() {
 
                 <div className="flex items-center gap-3 self-end sm:self-auto">
                     <Link 
-                        to={`/exercises/${exercise.id}/edit`}
+                        to={`/exercise/${exercise.id}/edit`}
                         className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:border-[#7B3FF2] text-slate-700 hover:text-[#7B3FF2] rounded-xl transition-all text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2]"
                     >
                         <Edit className="h-4 w-4" />
