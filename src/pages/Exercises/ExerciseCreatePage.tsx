@@ -6,11 +6,11 @@ import {
     Dumbbell, 
     Clock, 
     Flame, 
-    Zap, 
     Target,
     HelpCircle,
     CheckSquare,
-    Square
+    Square,
+    Timer
 } from 'lucide-react';
 import axios from '../../lib/axios';
 import { toast } from 'sonner';
@@ -18,18 +18,22 @@ import { toast } from 'sonner';
 interface FormState {
     name: string;
     category: string;
+    sub_category: string;
     difficulty_level: string;
-    target_muscle: string;
-    secondary_muscle: string;
+    injury_risk_level: string;
+    target_muscle_id: string;
+    secondary_muscle_id: string;
+    range_of_motion: string;
     rep_range_min: number;
     rep_range_max: number;
     recommended_duration_seconds: number;
+    recommended_rest_minutes: number;
     estimated_calories_per_minutes: number;
     short_description: string;
     instructions: string;
 }
 
-interface Equipment {
+interface ItemDefinition {
     id: string;
     name: string;
 }
@@ -38,46 +42,53 @@ export default function ExercisesCreatePage() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     
-    // États pour gérer la relation équipements
-    const [availableEquipments, setAvailableEquipments] = useState<Equipment[]>([]);
+    const [availableEquipments, setAvailableEquipments] = useState<ItemDefinition[]>([]);
+    const [availableMuscles, setAvailableMuscles] = useState<ItemDefinition[]>([]);
+    
+    const [isLoadingData, setIsLoadingData] = useState(true);
     const [selectedEquipmentIds, setSelectedEquipmentIds] = useState<string[]>([]);
-    const [isLoadingEquipments, setIsLoadingEquipments] = useState(true);
 
     const [form, setForm] = useState<FormState>({
         name: '',
         category: 'Strength',
+        sub_category: '',
         difficulty_level: 'Beginner',
-        target_muscle: '',
-        secondary_muscle: '',
+        injury_risk_level: 'Low',
+        target_muscle_id: '',
+        secondary_muscle_id: '',
+        range_of_motion: 'Full',
         rep_range_min: 8,
         rep_range_max: 12,
         recommended_duration_seconds: 60,
+        recommended_rest_minutes: 1,
         estimated_calories_per_minutes: 5,
         short_description: '',
         instructions: ''
     });
 
-    // 1. Récupération des équipements depuis l'API Lomkit au montage du composant
     useEffect(() => {
-        const fetchEquipments = async () => {
+        const fetchFormData = async () => {
             try {
-                // Utilisation du endpoint search avec une limite autorisée par ton back (ex: 25)
-                const response = await axios.post('/api/equipments/search', {
-                    search: { limit: 25 }
-                });
-                const data = response.data?.data || response.data;
-                if (Array.isArray(data)) {
-                    setAvailableEquipments(data);
-                }
+                const [equipmentsRes, musclesRes] = await Promise.all([
+                    axios.post('/api/equipments/search', { search: { limit: 50 } }),
+                    axios.post('/api/muscles/search', { search: { limit: 50 } })
+                ]);
+
+                const eqData = equipmentsRes.data?.data || equipmentsRes.data;
+                if (Array.isArray(eqData)) setAvailableEquipments(eqData);
+
+                const musData = musclesRes.data?.data || musclesRes.data;
+                if (Array.isArray(musData)) setAvailableMuscles(musData);
+
             } catch (err) {
-                console.error("Impossible de récupérer la liste des équipements:", err);
-                toast.error("Erreur lors du chargement des équipements.");
+                console.error("Erreur lors de la récupération des données:", err);
+                toast.error("Erreur lors du chargement des listes (muscles/équipements).");
             } finally {
-                setIsLoadingEquipments(false);
+                setIsLoadingData(false);
             }
         };
 
-        fetchEquipments();
+        fetchFormData();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -88,7 +99,6 @@ export default function ExercisesCreatePage() {
         }));
     };
 
-    // Gestion de la sélection/désélection d'un équipement
     const handleToggleEquipment = (id: string) => {
         setSelectedEquipmentIds(prev => 
             prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
@@ -106,7 +116,21 @@ export default function ExercisesCreatePage() {
         setIsSubmitting(true);
 
         try {
-            // 2. Formatage du payload Lomkit REST incluant les attributs ET les relations
+            const targetMuscleObj = availableMuscles.find(m => m.id === form.target_muscle_id);
+            const secondaryMuscleObj = availableMuscles.find(m => m.id === form.secondary_muscle_id);
+
+            const relationsObj: any = {};
+
+            if (selectedEquipmentIds.length > 0) {
+                relationsObj.equipments = selectedEquipmentIds.map(id => ({ operation: "attach", key: id }));
+            }
+            if (form.target_muscle_id) {
+                relationsObj.primaryMuscles = [{ operation: "attach", key: form.target_muscle_id }];
+            }
+            if (form.secondary_muscle_id) {
+                relationsObj.secondaryMuscles = [{ operation: "attach", key: form.secondary_muscle_id }];
+            }
+
             const payload = {
                 mutate: [
                     {
@@ -114,25 +138,22 @@ export default function ExercisesCreatePage() {
                         attributes: {
                             name: form.name,
                             category: form.category,
+                            sub_category: form.sub_category || 'Général',
                             difficulty_level: form.difficulty_level,
-                            target_muscle: form.target_muscle,
-                            secondary_muscle: form.secondary_muscle,
+                            injury_risk_level: form.injury_risk_level,
+                            target_muscle: targetMuscleObj ? targetMuscleObj.name : 'Aucun', 
+                            secondary_muscle: secondaryMuscleObj ? secondaryMuscleObj.name : 'Aucun', 
+                            range_of_motion: form.range_of_motion,
+                            equipment: 'Aucun', // Gardé pour satisfaire la colonne SQL
                             rep_range_min: form.rep_range_min,
                             rep_range_max: form.rep_range_max,
                             recommended_duration_seconds: form.recommended_duration_seconds,
+                            recommended_rest_minutes: form.recommended_rest_minutes,
                             estimated_calories_per_minutes: form.estimated_calories_per_minutes,
-                            short_description: form.short_description,
+                            short_description: form.short_description || 'Aucune description',
                             instructions: form.instructions
                         },
-                        // On ajoute le bloc relations dynamiquement si des équipements sont cochés
-                        ...(selectedEquipmentIds.length > 0 && {
-                            relations: {
-                                equipments: selectedEquipmentIds.map(id => ({
-                                    operation: "attach",
-                                    id: id
-                                }))
-                            }
-                        })
+                        ...(Object.keys(relationsObj).length > 0 && { relations: relationsObj })
                     }
                 ]
             };
@@ -144,7 +165,7 @@ export default function ExercisesCreatePage() {
         } catch (err: any) {
             console.error("Erreur lors de la création de l'exercice:", err);
             if (err.response?.status === 422) {
-                toast.error("Erreur de validation. Vérifiez les contraintes imposées par l'API.");
+                toast.error("Erreur de validation. Vérifiez les contraintes de l'API.");
             } else {
                 toast.error("Impossible de créer l'exercice. Problème de communication serveur.");
             }
@@ -154,7 +175,7 @@ export default function ExercisesCreatePage() {
     };
 
     return (
-        <main className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+        <main className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 mb-12">
             <nav aria-label="Navigation secondaire">
                 <Link 
                     to="/exercises" 
@@ -221,6 +242,21 @@ export default function ExercisesCreatePage() {
                         </div>
 
                         <div>
+                            <label htmlFor="sub_category" className="block text-sm font-bold text-slate-700 mb-1">
+                                Sous-catégorie
+                            </label>
+                            <input
+                                type="text"
+                                id="sub_category"
+                                name="sub_category"
+                                value={form.sub_category}
+                                onChange={handleChange}
+                                placeholder="Ex: Poids du corps, Haltérophilie..."
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                            />
+                        </div>
+
+                        <div>
                             <label htmlFor="difficulty_level" className="block text-sm font-bold text-slate-700 mb-1">
                                 Niveau de difficulté <span className="text-red-500" aria-hidden="true">*</span>
                             </label>
@@ -238,62 +274,107 @@ export default function ExercisesCreatePage() {
                                 <option value="Advanced">Avancé</option>
                             </select>
                         </div>
+
+                        <div>
+                            <label htmlFor="injury_risk_level" className="block text-sm font-bold text-slate-700 mb-1">
+                                Risque de blessure
+                            </label>
+                            <select
+                                id="injury_risk_level"
+                                name="injury_risk_level"
+                                value={form.injury_risk_level}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2] cursor-pointer"
+                            >
+                                <option value="Low">Faible</option>
+                                <option value="Medium">Modéré</option>
+                                <option value="High">Élevé</option>
+                            </select>
+                        </div>
                     </div>
                 </section>
 
-                {/* SECTION 2 : Anatomie & Équipements Multiples */}
+                {/* SECTION 2 : Anatomie & Équipements */}
                 <section className="space-y-6">
                     <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
                         <Target className="h-5 w-5 text-[#4A6BF0]" />
-                        <span>Anatomie & Équipements</span>
+                        <span>Anatomie & Biomécanique</span>
                     </h2>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         <div>
-                            <label htmlFor="target_muscle" className="block text-sm font-bold text-slate-700 mb-1">
+                            <label htmlFor="target_muscle_id" className="block text-sm font-bold text-slate-700 mb-1">
                                 Muscle principal
                             </label>
-                            <input
-                                type="text"
-                                id="target_muscle"
-                                name="target_muscle"
-                                value={form.target_muscle}
+                            <select
+                                id="target_muscle_id"
+                                name="target_muscle_id"
+                                value={form.target_muscle_id}
                                 onChange={handleChange}
-                                placeholder="Ex: Pectoraux, Quadriceps"
-                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
-                            />
+                                disabled={isLoadingData}
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2] cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+                            >
+                                <option value="">Sélectionner...</option>
+                                {availableMuscles.map(muscle => (
+                                    <option key={muscle.id} value={muscle.id} className="capitalize">
+                                        {muscle.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div>
-                            <label htmlFor="secondary_muscle" className="block text-sm font-bold text-slate-700 mb-1">
+                            <label htmlFor="secondary_muscle_id" className="block text-sm font-bold text-slate-700 mb-1">
                                 Muscle secondaire
                             </label>
-                            <input
-                                type="text"
-                                id="secondary_muscle"
-                                name="secondary_muscle"
-                                value={form.secondary_muscle}
+                            <select
+                                id="secondary_muscle_id"
+                                name="secondary_muscle_id"
+                                value={form.secondary_muscle_id}
                                 onChange={handleChange}
-                                placeholder="Ex: Triceps, Mollets"
-                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
-                            />
+                                disabled={isLoadingData}
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2] cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+                            >
+                                <option value="">Sélectionner...</option>
+                                {availableMuscles.map(muscle => (
+                                    <option key={muscle.id} value={muscle.id} className="capitalize">
+                                        {muscle.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="range_of_motion" className="block text-sm font-bold text-slate-700 mb-1">
+                                Amplitude (ROM)
+                            </label>
+                            <select
+                                id="range_of_motion"
+                                name="range_of_motion"
+                                value={form.range_of_motion}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2] cursor-pointer"
+                            >
+                                <option value="Full">Complète</option>
+                                <option value="Partial">Partielle</option>
+                                <option value="Isometric">Isométrique</option>
+                            </select>
                         </div>
                     </div>
 
-                    {/* Bloc de Sélection Multiple d'Équipements avec Fieldset pour l'accessibilité */}
-                    <fieldset className="space-y-3 pt-2">
+                    <fieldset className="space-y-3 pt-2 border-t border-slate-50 mt-4">
                         <legend className="text-sm font-bold text-slate-700 mb-2">
                             Équipements requis (sélection multiple)
                         </legend>
                         
-                        {isLoadingEquipments ? (
+                        {isLoadingData ? (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 animate-pulse" aria-hidden="true">
                                 {[1, 2, 3].map(n => (
                                     <div key={n} className="h-11 bg-slate-100 rounded-xl border border-slate-200"></div>
                                 ))}
                             </div>
                         ) : availableEquipments.length === 0 ? (
-                            <p className="text-xs font-medium text-slate-400 italic">Aucun équipement disponible sur le serveur.</p>
+                            <p className="text-xs font-medium text-slate-400 italic">Aucun équipement disponible.</p>
                         ) : (
                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {availableEquipments.map((eq) => {
@@ -329,10 +410,10 @@ export default function ExercisesCreatePage() {
                         <span>Performances & Métriques</span>
                     </h2>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6">
                         <div>
                             <label htmlFor="rep_range_min" className="block text-sm font-bold text-slate-700 mb-1">
-                                Répétitions Min
+                                Rép. Min
                             </label>
                             <div className="relative">
                                 <input
@@ -342,15 +423,14 @@ export default function ExercisesCreatePage() {
                                     min="0"
                                     value={form.rep_range_min}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
                                 />
-                                <Zap className="absolute right-3 top-3 h-4 w-4 text-slate-300 pointer-events-none" />
                             </div>
                         </div>
 
                         <div>
                             <label htmlFor="rep_range_max" className="block text-sm font-bold text-slate-700 mb-1">
-                                Répétitions Max
+                                Rép. Max
                             </label>
                             <div className="relative">
                                 <input
@@ -360,30 +440,49 @@ export default function ExercisesCreatePage() {
                                     min="0"
                                     value={form.rep_range_max}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
                                 />
-                                <Zap className="absolute right-3 top-3 h-4 w-4 text-slate-300 pointer-events-none" />
                             </div>
                         </div>
 
                         <div>
                             <label htmlFor="recommended_duration_seconds" className="block text-sm font-bold text-slate-700 mb-1">
-                                Durée (en secondes)
+                                Durée (sec)
                             </label>
-                            <input
-                                type="number"
-                                id="recommended_duration_seconds"
-                                name="recommended_duration_seconds"
-                                min="0"
-                                value={form.recommended_duration_seconds}
-                                onChange={handleChange}
-                                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    id="recommended_duration_seconds"
+                                    name="recommended_duration_seconds"
+                                    min="0"
+                                    value={form.recommended_duration_seconds}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                                />
+                            </div>
                         </div>
 
                         <div>
+                            <label htmlFor="recommended_rest_minutes" className="block text-sm font-bold text-slate-700 mb-1">
+                                Repos (min)
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    id="recommended_rest_minutes"
+                                    name="recommended_rest_minutes"
+                                    min="0"
+                                    value={form.recommended_rest_minutes}
+                                    onChange={handleChange}
+                                    className="w-full pl-3 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                                />
+                                <Timer className="absolute right-3 top-3 h-4 w-4 text-slate-300 pointer-events-none" />
+                            </div>
+                        </div>
+
+                        <div className="col-span-2 sm:col-span-1 lg:col-span-1">
                             <label htmlFor="estimated_calories_per_minutes" className="block text-sm font-bold text-slate-700 mb-1">
-                                kcal / minute
+                                kcal / min
                             </label>
                             <div className="relative">
                                 <input
@@ -393,7 +492,7 @@ export default function ExercisesCreatePage() {
                                     min="0"
                                     value={form.estimated_calories_per_minutes}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                                    className="w-full pl-3 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
                                 />
                                 <Flame className="absolute right-3 top-3 h-4 w-4 text-orange-300 pointer-events-none" />
                             </div>
