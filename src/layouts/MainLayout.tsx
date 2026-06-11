@@ -7,28 +7,28 @@ const NAV_CATEGORIES = [
         title: "MAIN",
         items: [
             { name: "Dashboard", path: "/dashboard", icon: Home },
-            { name: "Stats", path: "/stats", icon: Activity },
+            { name: "Stats", path: "/statistics", icon: Activity },
         ]
     },
     {
         title: "TRAINING",
         items: [
             { name: "Exercises", path: "/exercises", icon: Dumbbell },
-            { name: "Recommendations", path: "/recommendations", icon: Lightbulb, isAi: true },
+            { name: "Recommendations", path: "/exercises/recommendations", icon: Lightbulb, isAi: true },
         ]
     },
     {
         title: "NUTRITION",
         items: [
             { name: "Foods", path: "/foods", icon: Apple },
-            { name: "Scan Food", path: "/scan", icon: Camera, isAi: true },
+            { name: "Scan Food", path: "/food/scan", icon: Camera, isAi: true },
         ]
     },
     {
         title: "ACCOUNT",
         items: [
-            { name: "Profile", path: "/profile", icon: User },
-            { name: "Settings", path: "/settings", icon: Settings },
+            { name: "Profile", path: "/account/profile", icon: User },
+            { name: "Settings", path: "/account/settings", icon: Settings },
         ]
     }
 ];
@@ -39,7 +39,7 @@ export default function MainLayout() {
     const mobileNavItems = [
         { name: "Home", path: "/dashboard", icon: Home },
         { name: "Exercises", path: "/exercises", icon: Dumbbell },
-        { name: "Scan", path: "/scan", icon: Camera, isPrimary: true },
+        { name: "Scan", path: "/food/scan", icon: Camera, isPrimary: true },
         { name: "Foods", path: "/foods", icon: Apple },
         { name: "Profile", path: "/profile", icon: User },
     ];
