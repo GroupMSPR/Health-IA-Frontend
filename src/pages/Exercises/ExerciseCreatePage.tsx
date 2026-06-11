@@ -207,7 +207,7 @@ export default function ExercisesCreatePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="sm:col-span-2">
                             <label htmlFor="name" className="block text-sm font-bold text-slate-700 mb-1">
-                                Nom de l'exercice <span className="text-red-500" aria-hidden="true">*</span>
+                                Nom de l'exercice <span className="text-red-900" aria-hidden="true">*</span>
                             </label>
                             <input
                                 type="text"
@@ -235,7 +235,6 @@ export default function ExercisesCreatePage() {
                             >
                                 <option value="Strength">Force</option>
                                 <option value="Cardio">Cardio</option>
-                                <option value="HIIT">HIIT</option>
                                 <option value="Flexibility">Souplesse</option>
                                 <option value="Balance">Équilibre</option>
                             </select>
@@ -258,7 +257,7 @@ export default function ExercisesCreatePage() {
 
                         <div>
                             <label htmlFor="difficulty_level" className="block text-sm font-bold text-slate-700 mb-1">
-                                Niveau de difficulté <span className="text-red-500" aria-hidden="true">*</span>
+                                Niveau de difficulté <span className="text-red-900" aria-hidden="true">*</span>
                             </label>
                             <select
                                 id="difficulty_level"
@@ -525,7 +524,7 @@ export default function ExercisesCreatePage() {
 
                         <div>
                             <label htmlFor="instructions" className="block text-sm font-bold text-slate-700 mb-1">
-                                Instructions détaillées d'exécution <span className="text-red-500" aria-hidden="true">*</span>
+                                Instructions détaillées d'exécution <span className="text-red-900" aria-hidden="true">*</span>
                             </label>
                             <textarea
                                 id="instructions"

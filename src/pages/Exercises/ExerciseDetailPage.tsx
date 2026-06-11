@@ -146,10 +146,10 @@ export default function ExerciseDetailPage() {
 
     const getRiskStyles = (risk?: string) => {
         switch (risk) {
-            case 'Low': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-            case 'Medium': return 'text-amber-600 bg-amber-50 border-amber-200';
-            case 'High': return 'text-red-600 bg-red-50 border-red-200';
-            default: return 'text-slate-600 bg-slate-50 border-slate-200';
+            case 'Low': return 'text-emerald-700 bg-emerald-150 border-emerald-200';
+            case 'Medium': return 'text-amber-700 bg-amber-150 border-amber-200';
+            case 'High': return 'text-red-700 bg-red-150 border-red-200';
+            default: return 'text-slate-700 bg-slate-150 border-slate-200';
         }
     };
 
@@ -204,7 +204,7 @@ export default function ExerciseDetailPage() {
                     </Link>
                     <button 
                         onClick={handleDelete}
-                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl transition-colors text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-100 hover:bg-red-150 text-red-700 rounded-xl transition-colors text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                     >
                         <Trash2 className="h-4 w-4" />
                         <span>Supprimer</span>
@@ -220,7 +220,7 @@ export default function ExerciseDetailPage() {
                     <div className="bg-white border border-slate-100 shadow-sm rounded-2xl p-6 sm:p-8 space-y-6">
                         <div>
                             <div className="flex flex-wrap gap-2 items-center mb-3">
-                                <span className="px-3 py-1 bg-blue-50 text-[#4A6BF0] rounded-md text-xs font-bold capitalize">
+                                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-bold capitalize">
                                     {exercise.category}
                                 </span>
                                 {exercise.sub_category && (

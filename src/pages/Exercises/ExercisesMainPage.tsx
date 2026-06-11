@@ -218,7 +218,7 @@ export default function ExercisesMainPage() {
                 
                 <div className="flex items-center gap-2 sm:gap-3">
                     {isSelectMode && selectedIds.length > 0 && (
-                        <button onClick={handleDelete} className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl transition-colors text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
+                        <button onClick={handleDelete} className="flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 bg-red-100 text-red-700 hover:bg-red-150 rounded-xl transition-colors text-sm font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500">
                             <Trash2 className="h-4 w-4" aria-hidden="true" />
                             <span className="hidden sm:inline">Supprimer ({selectedIds.length})</span>
                         </button>

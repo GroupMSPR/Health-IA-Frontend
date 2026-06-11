@@ -278,7 +278,7 @@ export default function ExerciseEditPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="sm:col-span-2">
                             <label htmlFor="name" className="block text-sm font-bold text-slate-700 mb-1">
-                                Nom de l'exercice <span className="text-red-500" aria-hidden="true">*</span>
+                                Nom de l'exercice <span className="text-red-700" aria-hidden="true">*</span>
                             </label>
                             <input
                                 type="text"
@@ -327,7 +327,7 @@ export default function ExerciseEditPage() {
 
                         <div>
                             <label htmlFor="difficulty_level" className="block text-sm font-bold text-slate-700 mb-1">
-                                Niveau de difficulté <span className="text-red-500" aria-hidden="true">*</span>
+                                Niveau de difficulté <span className="text-red-700" aria-hidden="true">*</span>
                             </label>
                             <select
                                 id="difficulty_level"
@@ -575,7 +575,7 @@ export default function ExerciseEditPage() {
 
                         <div>
                             <label htmlFor="instructions" className="block text-sm font-bold text-slate-700 mb-1">
-                                Instructions détaillées d'exécution <span className="text-red-500" aria-hidden="true">*</span>
+                                Instructions détaillées d'exécution <span className="text-red-700" aria-hidden="true">*</span>
                             </label>
                             <textarea
                                 id="instructions"
