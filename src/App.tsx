@@ -73,7 +73,7 @@ export default function App() {
               // Read All & Delete <Route path="/foods" element={<FoodsMainPage />} />
               // Create <Route path="/food/create" element={<FoodCreatePage />} />
               // Read <Route path="/food/:id" element={<FoodDetailPage />} />
-              // Update <Route path="/food/edit/:id" element={<FoodEditPage />} />
+              // Update <Route path="/food/:id/edit/" element={<FoodEditPage />} />
 
               // Scan Food IA <Route path="/food/scan" element={<FoodScanIAPage />} />
               // Scan Result <Route path="/food/scan/result" element={<FoodScanIAResultPage />} />

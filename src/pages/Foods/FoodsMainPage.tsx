@@ -211,7 +211,7 @@ export default function FoodsMainPage() {
                         Alimentation
                     </h1>
                     <p className="mt-1 text-sm font-medium text-slate-500" aria-live="polite">
-                        {globalTotal !== null ? `${globalTotal} ingrédients dans votre base de données` : 'Chargement...'}
+                        {globalTotal !== null ? `${globalTotal} aliments dans votre bibliothèque` : 'Chargement...'}
                     </p>
                 </div>
                 
@@ -243,7 +243,7 @@ export default function FoodsMainPage() {
 
                     <Link to="/food/create" className="flex items-center justify-center bg-[#7B3FF2] hover:bg-[#6830d1] text-white transition-colors sm:px-4 sm:py-2.5 rounded-xl w-10 h-10 sm:w-auto sm:h-auto shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] focus-visible:ring-offset-2">
                         <Plus className="h-5 w-5 sm:mr-2" aria-hidden="true" />
-                        <span className="hidden sm:inline font-bold text-sm">Ajouter un ingrédient</span>
+                        <span className="hidden sm:inline font-bold text-sm">Ajouter un Aliment</span>
                     </Link>
                 </div>
             </header>
