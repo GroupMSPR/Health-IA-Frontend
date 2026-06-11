@@ -31,13 +31,12 @@ interface Exercise {
     target_muscle: string;
 }
 
-const filters = ['All', 'Strength', 'Cardio', 'HIIT', 'Flexibility', 'Balance'];
+const filters = ['All', 'Strength', 'Cardio', 'Flexibility', 'Balance'];
 
 const filterTranslations: Record<string, string> = {
     'All': 'Tous',
     'Strength': 'Force',
     'Cardio': 'Cardio',
-    'HIIT': 'HIIT',
     'Flexibility': 'Souplesse',
     'Balance': 'Équilibre'
 };
