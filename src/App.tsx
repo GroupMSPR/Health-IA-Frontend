@@ -16,6 +16,7 @@ import ResetPassword from './pages/Auth/ResetPasswordPage';
 import MainLayout from './layouts/MainLayout';
 import DashboardPage from './pages/DashboardPage';
 import StatisticsPage from './pages/StatisticsPage';
+import MyMetricsPage from './pages/MyMetricsPage'
 
 // Exercise Pages
 
@@ -58,6 +59,7 @@ export default function App() {
 
               // Dashboard <Route path="/dashboard" element={<DashboardPage />} />
               // Statistics <Route path="/statistics" element={<StatisticsPage />} />
+              // My Metrics <Route path="/my-metrics" element={<MyMetricsPage />} />
 
             // ====================== Exercises ====================== //
 
@@ -66,7 +68,7 @@ export default function App() {
               // Read <Route path="/exercise/:id" element={<ExerciseDetailPage />} />
               // Update <Route path="/exercise/:id/edit" element={<ExerciseEditPage />} />
 
-              // Moteur de Recommendation IA <Route path="/exercises/recommendations" element={<ExerciseRecommendsIAPage />} />
+              // Moteur de Recommendation IA <Route path="/exercises-recommendations" element={<ExerciseRecommendsIAPage />} />
 
             // ====================== Foods ====================== //
 
@@ -75,8 +77,8 @@ export default function App() {
               // Read <Route path="/food/:id" element={<FoodDetailPage />} />
               // Update <Route path="/food/:id/edit/" element={<FoodEditPage />} />
 
-              // Scan Food IA <Route path="/food/scan" element={<FoodScanIAPage />} />
-              // Scan Result <Route path="/food/scan/result" element={<FoodScanIAResultPage />} />
+              // Scan Food IA <Route path="/food-scan" element={<FoodScanIAPage />} />
+              // Scan Result <Route path="/food-scan/result" element={<FoodScanIAResultPage />} />
 
             // ====================== Account ====================== //
 

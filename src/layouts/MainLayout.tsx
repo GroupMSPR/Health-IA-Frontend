@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { Home, Activity, Dumbbell, Apple, Camera, User, LogOut, Lightbulb, Sparkles, Settings } from 'lucide-react';
+import { Home, Activity, Dumbbell, Apple, Camera, User, LogOut, Lightbulb, Sparkles, Settings, ChartColumnIncreasing } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const NAV_CATEGORIES = [
@@ -7,21 +7,22 @@ const NAV_CATEGORIES = [
         title: "MAIN",
         items: [
             { name: "Dashboard", path: "/dashboard", icon: Home },
-            { name: "Stats", path: "/statistics", icon: Activity },
+            { name: "Stats", path: "/statistics", icon: ChartColumnIncreasing },
+            { name: "My Metrics", path: "/my-metrics", icon: Activity },
         ]
     },
     {
         title: "TRAINING",
         items: [
             { name: "Exercises", path: "/exercises", icon: Dumbbell },
-            { name: "Recommendations", path: "/exercises/recommendations", icon: Lightbulb, isAi: true },
+            { name: "Recommendations", path: "/exercises-recommendations", icon: Lightbulb, isAi: true },
         ]
     },
     {
         title: "NUTRITION",
         items: [
             { name: "Foods", path: "/foods", icon: Apple },
-            { name: "Scan Food", path: "/food/scan", icon: Camera, isAi: true },
+            { name: "Scan Food", path: "/food-scan", icon: Camera, isAi: true },
         ]
     },
     {
@@ -39,7 +40,7 @@ export default function MainLayout() {
     const mobileNavItems = [
         { name: "Home", path: "/dashboard", icon: Home },
         { name: "Exercises", path: "/exercises", icon: Dumbbell },
-        { name: "Scan", path: "/food/scan", icon: Camera, isPrimary: true },
+        { name: "Scan", path: "/food-scan", icon: Camera, isPrimary: true },
         { name: "Foods", path: "/foods", icon: Apple },
         { name: "Profile", path: "/account/profile", icon: User },
     ];

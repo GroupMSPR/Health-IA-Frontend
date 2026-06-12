@@ -121,7 +121,7 @@ export default function DashboardPage() {
                         <Dumbbell className="h-5 w-5 text-blue-600" aria-hidden="true" />
                         Ton programme du jour
                     </h2>
-                    <Link to="/exercises/recommendations" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center">
+                    <Link to="/exercises-recommendations" className="text-sm font-semibold text-blue-600 hover:text-blue-700 flex items-center">
                         Voir tout <ChevronRight className="h-4 w-4 ml-0.5" />
                     </Link>
                 </div>
@@ -195,7 +195,7 @@ export default function DashboardPage() {
                         </div>
                     </Link>
 
-                    <Link to="/food/scan" className="flex-1 bg-gradient-to-br from-[#4A6BF0] to-[#7B3FF2] p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all group relative overflow-hidden flex items-center gap-4">
+                    <Link to="/food-scan" className="flex-1 bg-gradient-to-br from-[#4A6BF0] to-[#7B3FF2] p-6 rounded-3xl shadow-lg hover:shadow-xl transition-all group relative overflow-hidden flex items-center gap-4">
                         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                         <div className="bg-white/20 backdrop-blur-md p-4 rounded-2xl text-white group-hover:scale-110 transition-transform relative z-10">
                             <Camera className="h-7 w-7" strokeWidth={2} />
