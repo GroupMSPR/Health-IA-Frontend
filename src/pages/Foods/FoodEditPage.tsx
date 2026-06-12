@@ -187,7 +187,7 @@ export default function FoodEditPage() {
         <main className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 mb-12">
             <nav aria-label="Navigation secondaire">
                 <Link 
-                    to={`/foods/${id}`} 
+                    to={`/food/${id}`} 
                     className="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-[#7B3FF2] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] rounded-lg p-1 w-fit"
                 >
                     <ArrowLeft className="h-4 w-4" />
