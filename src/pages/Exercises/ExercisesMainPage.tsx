@@ -296,7 +296,7 @@ export default function ExercisesMainPage() {
                             role="tab"
                             aria-selected={activeFilter === filter}
                             onClick={() => handleFilterClick(filter)}
-                            className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] focus-visible:ring-offset-2 ${
+                            className={`whitespace-nowrap px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
                                 activeFilter === filter
                                     ? 'bg-[#4A6BF0] text-white shadow-md'
                                     : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
