@@ -30,7 +30,7 @@ import ExercisesMainPage from './pages/Exercises/ExercisesMainPage';
 import ExercisesCreatePage from './pages/Exercises/ExerciseCreatePage';
 import ExerciseDetailPage from './pages/Exercises/ExerciseDetailPage';
 import ExerciseEditPage from './pages/Exercises/ExerciseEditPage';
-import ExerciseRecommendsIAPage from './pages/Exercises/ExerciseRecommendsIAPage';
+import ExercisesRecommendsIAPage from './pages/Exercises/ExercisesRecommendsIAPage';
 
 // Food Pages
 
@@ -80,7 +80,7 @@ export default function App() {
               // Read <Route path="/exercise/:id" element={<ExerciseDetailPage />} />
               // Update <Route path="/exercise/:id/edit" element={<ExerciseEditPage />} />
 
-              // Moteur de Recommendation IA <Route path="/exercises-recommendations" element={<ExerciseRecommendsIAPage />} />
+              // Moteur de Recommendation IA <Route path="/exercises-recommendations" element={<ExercisesRecommendsIAPage />} />
 
             // ====================== Foods ====================== //
 
