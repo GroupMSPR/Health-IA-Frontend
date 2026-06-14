@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
     ArrowLeft, 
@@ -11,7 +11,8 @@ import {
     Beef,
     Wheat,
     Droplet,
-    Dna
+    Dna,
+    UploadCloud
 } from 'lucide-react';
 import axios from '../../lib/axios';
 import { toast } from 'sonner';
@@ -33,6 +34,9 @@ interface FormState {
 export default function FoodCreatePage() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    // Référence pour l'input file caché
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Initialisation avec des 0 pour satisfaire les "required" du back-end
     const [form, setForm] = useState<FormState>({
@@ -56,6 +60,24 @@ export default function FoodCreatePage() {
             // Conversion automatique en nombre pour les champs de type 'number'
             [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value
         }));
+    };
+
+    // Gestion de l'upload d'image et conversion en Base64
+    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("L'image est trop volumineuse. La taille maximum est de 5 MB.");
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // Le résultat est une chaîne Base64 (data URI) qui peut être lue comme une URL classique
+                setForm(prev => ({ ...prev, image: reader.result as string }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -109,6 +131,17 @@ export default function FoodCreatePage() {
 
     return (
         <main className="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 mb-12">
+            
+            {/* Input file caché déclenché par le bouton */}
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileUpload} 
+                accept="image/*" 
+                className="hidden" 
+                aria-hidden="true"
+            />
+
             <nav aria-label="Navigation secondaire">
                 <Link 
                     to="/foods" 
@@ -177,21 +210,29 @@ export default function FoodCreatePage() {
 
                         <div>
                             <label htmlFor="image" className="block text-sm font-bold text-slate-700 mb-1">
-                                URL de l'image (optionnel)
+                                Image (URL ou fichier)
                             </label>
-                            <div className="relative">
+                            <div className="relative flex items-center">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <ImageIcon className="h-4 w-4 text-slate-400" />
                                 </div>
                                 <input
-                                    type="url"
+                                    type="text" // On passe en text pour supporter le format Base64
                                     id="image"
                                     name="image"
                                     value={form.image}
                                     onChange={handleChange}
-                                    placeholder="https://exemple.com/image.jpg"
-                                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
+                                    placeholder="https://... ou importez un fichier"
+                                    className="w-full pl-10 pr-12 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2] truncate"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-[#7B3FF2] transition-colors focus:outline-none"
+                                    title="Uploader une image depuis l'ordinateur"
+                                >
+                                    <UploadCloud className="h-5 w-5" />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -215,7 +256,7 @@ export default function FoodCreatePage() {
                                     id="calories"
                                     name="calories"
                                     min="0"
-                                    step="0.1"
+                                    step="any"
                                     value={form.calories}
                                     onChange={handleChange}
                                     className="w-full pl-3 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -234,7 +275,7 @@ export default function FoodCreatePage() {
                                     id="protein"
                                     name="protein"
                                     min="0"
-                                    step="0.1"
+                                    step="any"
                                     value={form.protein}
                                     onChange={handleChange}
                                     className="w-full pl-3 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -253,7 +294,7 @@ export default function FoodCreatePage() {
                                     id="carbohydrates"
                                     name="carbohydrates"
                                     min="0"
-                                    step="0.1"
+                                    step="any"
                                     value={form.carbohydrates}
                                     onChange={handleChange}
                                     className="w-full pl-3 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -272,7 +313,7 @@ export default function FoodCreatePage() {
                                     id="fat"
                                     name="fat"
                                     min="0"
-                                    step="0.1"
+                                    step="any"
                                     value={form.fat}
                                     onChange={handleChange}
                                     className="w-full pl-3 pr-8 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -300,7 +341,7 @@ export default function FoodCreatePage() {
                                 id="fiber"
                                 name="fiber"
                                 min="0"
-                                step="0.1"
+                                step="any"
                                 value={form.fiber}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -316,7 +357,7 @@ export default function FoodCreatePage() {
                                 id="sugars"
                                 name="sugars"
                                 min="0"
-                                step="0.1"
+                                step="any"
                                 value={form.sugars}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -332,7 +373,7 @@ export default function FoodCreatePage() {
                                 id="sodium"
                                 name="sodium"
                                 min="0"
-                                step="0.1"
+                                step="any"
                                 value={form.sodium}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
@@ -348,7 +389,7 @@ export default function FoodCreatePage() {
                                 id="cholesterol"
                                 name="cholesterol"
                                 min="0"
-                                step="0.1"
+                                step="any"
                                 value={form.cholesterol}
                                 onChange={handleChange}
                                 className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2]"
