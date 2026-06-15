@@ -14,7 +14,8 @@ import {
     Check, 
     X,
     AlertTriangle, 
-    SlidersHorizontal 
+    SlidersHorizontal, 
+    Dumbbell
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -206,10 +207,11 @@ export default function ExercisesMainPage() {
     const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
 
     return (
-        <main className="max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500">
+        <main className="max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 mb-12">
             <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                        <Dumbbell className="h-8 w-8 text-[#7B3FF2]" aria-hidden="true" />
                         Exercices
                     </h1>
                     <p className="mt-1 text-sm font-medium text-slate-500" aria-live="polite">

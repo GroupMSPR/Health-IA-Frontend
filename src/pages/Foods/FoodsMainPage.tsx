@@ -15,7 +15,8 @@ import {
     AlertTriangle, 
     SlidersHorizontal,
     Wheat,
-    Droplet
+    Droplet,
+    Apple
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -207,7 +208,8 @@ export default function FoodsMainPage() {
         <main className="max-w-7xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 mb-12">
             <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                        <Apple className="h-8 w-8 text-[#7B3FF2]" aria-hidden="true" />
                         Alimentation
                     </h1>
                     <p className="mt-1 text-sm font-medium text-slate-500" aria-live="polite">
@@ -243,7 +245,7 @@ export default function FoodsMainPage() {
 
                     <Link to="/food/create" className="flex items-center justify-center bg-[#7B3FF2] hover:bg-[#6830d1] text-white transition-colors sm:px-4 sm:py-2.5 rounded-xl w-10 h-10 sm:w-auto sm:h-auto shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] focus-visible:ring-offset-2">
                         <Plus className="h-5 w-5 sm:mr-2" aria-hidden="true" />
-                        <span className="hidden sm:inline font-bold text-sm">Ajouter un Aliment</span>
+                        <span className="hidden sm:inline font-bold text-sm">Ajouter un aliment</span>
                     </Link>
                 </div>
             </header>
