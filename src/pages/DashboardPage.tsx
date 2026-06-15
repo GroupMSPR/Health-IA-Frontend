@@ -1,6 +1,9 @@
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Activity, Flame, Dumbbell, Target, TrendingUp, Clock, Zap, Camera, Apple, ChevronRight } from 'lucide-react';
+// Ajout de Footprints et Scale pour les nouvelles icônes dynamiques
+import { Activity, Flame, Dumbbell, TrendingUp, Clock, Zap, Camera, Apple, ChevronRight, Sparkles, ArrowRight, Footprints, Scale } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from '../lib/axios';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -16,14 +19,150 @@ import { Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
+interface HealthMetric {
+    id: string;
+    date: string;
+    weight: number | null;
+    steps_count: number | null;
+    sleep_time: string | null;
+    calories_burned: number | null;
+    active_minute: number | null;
+}
+
 export default function DashboardPage() {
     const { user } = useAuth();
 
+    // --- ÉTATS DYNAMIQUES ---
+    const [hasTodayMetric, setHasTodayMetric] = useState(true);
+    const [weeklyData, setWeeklyData] = useState({
+        totalMinutes: 0,
+        totalCalories: 0,
+        totalSteps: 0,
+        latestWeight: null as number | null,
+        minChange: { text: '--', type: 'neutral' },
+        calChange: { text: '--', type: 'neutral' },
+        stepChange: { text: '--', type: 'neutral' },
+        weightChange: { text: '--', type: 'neutral' },
+        chartLabels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+        chartCalories: [0, 0, 0, 0, 0, 0, 0],
+        chartSteps: [0, 0, 0, 0, 0, 0, 0]
+    });
+
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchData = async () => {
+            try {
+                // 1. Calcul de la fenêtre des 7 derniers jours
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                const pastDateString = sevenDaysAgo.toISOString().split('T')[0];
+
+                // 2. Requête API
+                const response = await axios.post('/api/health-metrics/search', {
+                    search: {
+                        filters: [
+                            { field: 'user_id', operator: '=', value: user.id },
+                            { field: 'date', operator: '>=', value: pastDateString }
+                        ],
+                        sorts: [
+                            { field: 'date', direction: 'desc' }
+                        ]
+                    }
+                });
+
+                const data: HealthMetric[] = response.data?.data || response.data || [];
+
+                // 3. Vérifier si on a un bilan pour aujourd'hui (pour la Card Prompt)
+                const todayString = new Date().toISOString().split('T')[0];
+                const todayMetricExists = data.some(m => m.date.startsWith(todayString));
+                setHasTodayMetric(todayMetricExists);
+
+                // 4. Préparer les tableaux pour les 7 derniers jours (du plus ancien au plus récent)
+                const last7Days = [...Array(7)].map((_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() - (6 - i));
+                    return d.toISOString().split('T')[0];
+                });
+                
+                // Noms des jours pour le graphique
+                const dayNames = last7Days.map(dateStr => new Date(dateStr).toLocaleDateString('fr-FR', { weekday: 'short' }));
+
+                // Remplissage des données jour par jour
+                const calData = last7Days.map(date => {
+                    const m = data.find(x => x.date.startsWith(date));
+                    return m?.calories_burned ? Number(m.calories_burned) : 0;
+                });
+                const stpData = last7Days.map(date => {
+                    const m = data.find(x => x.date.startsWith(date));
+                    return m?.steps_count ? Number(m.steps_count) : 0;
+                });
+                const minData = last7Days.map(date => {
+                    const m = data.find(x => x.date.startsWith(date));
+                    return m?.active_minute ? Number(m.active_minute) : 0;
+                });
+
+                // 5. Calcul des totaux
+                const totalCal = calData.reduce((a, b) => a + b, 0);
+                const totalMin = minData.reduce((a, b) => a + b, 0);
+                const totalStp = stpData.reduce((a, b) => a + b, 0);
+                
+                const latestWeight = data.find(m => m.weight !== null)?.weight || user.weight || null;
+                const previousWeight = data.filter(m => m.weight !== null).length > 1 
+                    ? data.filter(m => m.weight !== null)[1].weight 
+                    : null;
+
+                // 6. Calcul des tendances (Aujourd'hui vs Hier)
+                const getChange = (today: number, yesterday: number) => {
+                    if (!yesterday && !today) return { text: '--', type: 'neutral' };
+                    if (!yesterday) return { text: '+100%', type: 'positive' };
+                    const diff = Math.round(((today - yesterday) / yesterday) * 100);
+                    return {
+                        text: diff > 0 ? `+${diff}%` : `${diff}%`,
+                        type: diff > 0 ? 'positive' : (diff < 0 ? 'negative' : 'neutral')
+                    };
+                };
+
+                let weightChange = { text: '--', type: 'neutral' };
+                if (latestWeight && previousWeight && latestWeight !== previousWeight) {
+                    const diff = (latestWeight - previousWeight).toFixed(1);
+                    // Pour le poids, une baisse est "positive" en général dans une app fitness
+                    weightChange = {
+                        text: Number(diff) > 0 ? `+${diff}kg` : `${diff}kg`,
+                        type: Number(diff) > 0 ? 'negative' : 'positive' 
+                    };
+                }
+
+                // 7. Mise à jour de l'état global
+                setWeeklyData({
+                    totalMinutes: totalMin,
+                    totalCalories: totalCal,
+                    totalSteps: totalStp,
+                    latestWeight: latestWeight,
+                    minChange: getChange(minData[6], minData[5]),
+                    calChange: getChange(calData[6], calData[5]),
+                    stepChange: getChange(stpData[6], stpData[5]),
+                    weightChange: weightChange,
+                    chartLabels: dayNames,
+                    chartCalories: calData,
+                    chartSteps: stpData
+                });
+
+            } catch (error) {
+                console.error("Erreur récupération données dashboard:", error);
+                setHasTodayMetric(true); // Fallback silencieux
+            }
+        };
+
+        fetchData();
+    }, [user]);
+
+    // --- CONSTRUCTION DES STATS DYNAMIQUES ---
     const stats = [
-        { id: 1, name: 'Minutes actives', value: '248', change: '+12%', changeType: 'positive', icon: Activity, color: 'text-blue-700', bgColor: 'bg-blue-50' },
-        { id: 2, name: 'Calories brûlées', value: '2 340', change: '+8%', changeType: 'positive', icon: Flame, color: 'text-orange-600', bgColor: 'bg-orange-50' },
-        { id: 3, name: 'Objectifs atteints', value: '18/20', change: '90%', changeType: 'neutral', icon: Target, color: 'text-purple-700', bgColor: 'bg-purple-50' },
-        { id: 4, name: 'Progression hebdo', value: '85%', change: '+5%', changeType: 'positive', icon: TrendingUp, color: 'text-emerald-700', bgColor: 'bg-emerald-50' },
+        { id: 1, name: 'Minutes actives (7j)', value: weeklyData.totalMinutes.toString(), change: weeklyData.minChange.text, changeType: weeklyData.minChange.type, icon: Activity, color: 'text-blue-700', bgColor: 'bg-blue-50' },
+        { id: 2, name: 'Calories brûlées (7j)', value: weeklyData.totalCalories.toLocaleString('fr-FR'), change: weeklyData.calChange.text, changeType: weeklyData.calChange.type, icon: Flame, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+        { id: 3, name: 'Pas cumulés (7j)', value: weeklyData.totalSteps.toLocaleString('fr-FR'), change: weeklyData.stepChange.text, changeType: weeklyData.stepChange.type, icon: Footprints, color: 'text-purple-700', bgColor: 'bg-purple-50' },
+        { id: 4, name: 'Poids actuel', value: weeklyData.latestWeight ? `${weeklyData.latestWeight}` : '--', change: weeklyData.weightChange.text, changeType: weeklyData.weightChange.type, icon: Scale, color: 'text-emerald-700', bgColor: 'bg-emerald-50' },
     ];
 
     const workouts = [
@@ -32,12 +171,13 @@ export default function DashboardPage() {
         { id: 3, title: 'Endurance Rameur', duration: '25 min', intensity: 'Moyenne', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600&h=400' },
     ];
 
+    // --- GRAPH DYNAMIQUE ---
     const chartData = {
-        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+        labels: weeklyData.chartLabels, // Jours dynamiques
         datasets: [
             {
                 label: 'Calories',
-                data: [2100, 2600, 2200, 2800, 2400, 3000, 2500],
+                data: weeklyData.chartCalories, // Données réelles
                 borderColor: '#7B3FF2',
                 backgroundColor: 'rgba(123, 63, 242, 0.05)',
                 borderWidth: 3,
@@ -50,7 +190,7 @@ export default function DashboardPage() {
             },
             {
                 label: 'Pas',
-                data: [5000, 7000, 6000, 8000, 5500, 9000, 7500],
+                data: weeklyData.chartSteps, // Données réelles
                 borderColor: '#3b82f6',
                 borderWidth: 3,
                 tension: 0.4,
@@ -82,16 +222,46 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 pb-12">
             
             <header>
-                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight capitalize">
                     Bonjour, {user?.first_name || 'Alex'} !
                 </h1>
                 <p className="mt-2 text-slate-600 font-medium">
                     Voici ton résumé fitness du jour.
                 </p>
             </header>
+
+            {/* --- LA CARD PROMPT : Apparaît si aucun bilan trouvé pour la date du jour --- */}
+            {!hasTodayMetric && (
+                <section className="bg-gradient-to-br from-[#7B3FF2] to-[#5a24c5] rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-[#7B3FF2]/20 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transform transition-all hover:scale-[1.01]">
+                    <div className="absolute -right-6 -top-10 opacity-10 pointer-events-none">
+                        <Activity className="h-64 w-64" />
+                    </div>
+                    
+                    <div className="relative z-10 flex-1 text-center md:text-left">
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-lg text-xs font-bold uppercase tracking-wider mb-3">
+                            <Sparkles className="h-3.5 w-3.5 text-yellow-300" />
+                            Action Quotidienne
+                        </div>
+                        <h2 className="text-xl sm:text-2xl font-extrabold mb-2 leading-tight">
+                            Comment te sens-tu aujourd'hui ?
+                        </h2>
+                        <p className="text-purple-100 font-medium text-sm sm:text-base max-w-xl mx-auto md:mx-0">
+                            Prends 1 minute pour enregistrer tes données (sommeil, poids, pas). Ces informations sont cruciales pour permettre à l'IA d'adapter ton programme.
+                        </p>
+                    </div>
+
+                    <Link 
+                        to="/health-metric/create" 
+                        className="relative z-10 shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-[#7B3FF2] rounded-xl font-extrabold transition-all hover:bg-slate-50 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#7B3FF2] w-full md:w-auto"
+                    >
+                        <span>Créer mon bilan du jour</span>
+                        <ArrowRight className="h-4 w-4" />
+                    </Link>
+                </section>
+            )}
 
             <section aria-labelledby="stats-heading">
                 <h2 id="stats-heading" className="sr-only">Tes statistiques de la journée</h2>
@@ -102,7 +272,12 @@ export default function DashboardPage() {
                                 <div className={`p-3 rounded-2xl ${stat.bgColor} ${stat.color}`}>
                                     <stat.icon className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
                                 </div>
-                                <span className={`text-sm font-bold ${stat.changeType === 'positive' ? 'text-emerald-700' : 'text-emerald-700'}`}>
+                                {/* Changement dynamique de la couleur de la progression */}
+                                <span className={`text-sm font-bold ${
+                                    stat.changeType === 'positive' ? 'text-emerald-600' : 
+                                    stat.changeType === 'negative' ? 'text-red-500' : 
+                                    'text-slate-400'
+                                }`}>
                                     {stat.change}
                                 </span>
                             </div>
@@ -149,7 +324,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
                 
-                {/* --- GRAPH CHART.JS --- */}
+                {/* --- GRAPH CHART.JS DYNAMIQUE --- */}
                 <section className="xl:col-span-2 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col" aria-labelledby="chart-heading">
                     <div className="flex items-center justify-between mb-8">
                         <h2 id="chart-heading" className="text-xl font-bold text-slate-900 flex items-center gap-2">
