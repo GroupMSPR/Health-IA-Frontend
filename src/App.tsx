@@ -16,7 +16,13 @@ import ResetPassword from './pages/Auth/ResetPasswordPage';
 import MainLayout from './layouts/MainLayout';
 import DashboardPage from './pages/DashboardPage';
 import StatisticsPage from './pages/StatisticsPage';
-import MyMetricsPage from './pages/MyMetricsPage'
+
+// Health Metrics
+
+import HealthMetricsMainPage from './pages/HealthMetrics/HealthMetricsMainPage';
+import HealthMetricsDetailPage from './pages/HealthMetrics/HealthMetricsDetailPage';
+import HealthMetricsCreatePage from './pages/HealthMetrics/HealthMetricsCreatePage';
+import HealthMetricsEditPage from './pages/HealthMetrics/HealthMetricsEditPage';
 
 // Exercise Pages
 
@@ -59,7 +65,13 @@ export default function App() {
 
               // Dashboard <Route path="/dashboard" element={<DashboardPage />} />
               // Statistics <Route path="/statistics" element={<StatisticsPage />} />
-              // My Metrics <Route path="/my-metrics" element={<MyMetricsPage />} />
+              // My Metrics <Route path="/my-metrics" element={<HealthMetricsMainPage />} />
+
+            // ====================== Health Metrics ====================== //
+
+              // Create <Route path='/health-metric/create' element={<HealthMetricsCreatePage />} />
+              // Read <Route path="/health-metric/:id" element={<HealthMetricsDetailPage />} />
+              // Create <Route path='/health-metric/:id/edit' element={<HealthMetricsEditPage />} />
 
             // ====================== Exercises ====================== //
 
