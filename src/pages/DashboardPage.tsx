@@ -255,7 +255,7 @@ export default function DashboardPage() {
 
                     <Link 
                         to="/health-metric/create" 
-                        className="relative z-10 shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-[#7B3FF2] rounded-xl font-extrabold transition-all hover:bg-slate-50 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#7B3FF2] w-full md:w-auto"
+                        className="relative z-10 shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-[#7B3FF2] rounded-xl font-extrabold transition-all hover:bg-slate-50 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#7B3FF2] w-full md:w-auto hover:scale-[1.01]"
                     >
                         <span>Créer mon bilan du jour</span>
                         <ArrowRight className="h-4 w-4" />
