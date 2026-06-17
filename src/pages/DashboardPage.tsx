@@ -1,9 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-// Ajout de Footprints et Scale pour les nouvelles icônes dynamiques
-import { Activity, Flame, Dumbbell, TrendingUp, Clock, Zap, Camera, Apple, ChevronRight, Sparkles, ArrowRight, Footprints, Scale } from 'lucide-react';
+import { 
+    Activity, 
+    Flame, 
+    Dumbbell, 
+    TrendingUp, 
+    Clock, 
+    Zap, 
+    Camera, 
+    Apple, 
+    ChevronRight, 
+    Sparkles, 
+    ArrowRight, 
+    Footprints, 
+    Scale,
+    Target, // Ajouté pour l'onboarding
+    AlertTriangle, // Ajouté pour l'onboarding
+    CheckCircle2 // Ajouté pour l'onboarding
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-import axios from '../lib/axios';
+import axios from '../lib/axios'; // Attention au chemin selon ta structure
+import { toast } from 'sonner'; // Ajouté pour les notifications
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,7 +49,18 @@ interface HealthMetric {
 export default function DashboardPage() {
     const { user } = useAuth();
 
-    // --- ÉTATS DYNAMIQUES ---
+    // --- ÉTATS GLOBAUX ---
+    const [isLoading, setIsLoading] = useState(true);
+
+    // --- ÉTATS ONBOARDING (Configuration du profil) ---
+    const [needsOnboarding, setNeedsOnboarding] = useState(false);
+    const [availableGoals, setAvailableGoals] = useState<any[]>([]);
+    const [availableConstraints, setAvailableConstraints] = useState<any[]>([]);
+    const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
+    const [selectedConstraints, setSelectedConstraints] = useState<string[]>([]);
+    const [isSavingOnboarding, setIsSavingOnboarding] = useState(false);
+
+    // --- ÉTATS DYNAMIQUES DASHBOARD ---
     const [hasTodayMetric, setHasTodayMetric] = useState(true);
     const [weeklyData, setWeeklyData] = useState({
         totalMinutes: 0,
@@ -53,12 +81,35 @@ export default function DashboardPage() {
 
         const fetchData = async () => {
             try {
-                // 1. Calcul de la fenêtre des 7 derniers jours
+                // 1. VÉRIFICATION DE L'ONBOARDING (L'utilisateur a-t-il des objectifs ?)
+                const userRes = await axios.post('/api/users/search', {
+                    search: {
+                        filters: [{ field: 'id', operator: '=', value: user.id }],
+                        includes: ['goals'] // On inclut les relations
+                    }
+                });
+
+                const currentUserData = userRes.data?.data?.[0] || userRes.data?.[0];
+                
+                // Si pas d'objectifs, on déclenche l'onboarding
+                if (currentUserData && (!currentUserData.goals || currentUserData.goals.length === 0)) {
+                    setNeedsOnboarding(true);
+                    // On récupère les listes depuis Lomkit
+                    const [gRes, cRes] = await Promise.all([
+                        axios.post('/api/goals/search', { search: {} }),
+                        axios.post('/api/constraints/search', { search: {} })
+                    ]);
+                    setAvailableGoals(gRes.data?.data || gRes.data || []);
+                    setAvailableConstraints(cRes.data?.data || cRes.data || []);
+                    setIsLoading(false);
+                    return; // On arrête ici pour ne pas charger le reste du dashboard
+                }
+
+                // 2. CHARGEMENT NORMAL DU DASHBOARD (S'il a déjà des objectifs)
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                 const pastDateString = sevenDaysAgo.toISOString().split('T')[0];
 
-                // 2. Requête API
                 const response = await axios.post('/api/health-metrics/search', {
                     search: {
                         filters: [
@@ -73,22 +124,20 @@ export default function DashboardPage() {
 
                 const data: HealthMetric[] = response.data?.data || response.data || [];
 
-                // 3. Vérifier si on a un bilan pour aujourd'hui (pour la Card Prompt)
+                // Vérifier si on a un bilan pour aujourd'hui
                 const todayString = new Date().toISOString().split('T')[0];
                 const todayMetricExists = data.some(m => m.date.startsWith(todayString));
                 setHasTodayMetric(todayMetricExists);
 
-                // 4. Préparer les tableaux pour les 7 derniers jours (du plus ancien au plus récent)
+                // Préparer les tableaux pour les 7 derniers jours
                 const last7Days = [...Array(7)].map((_, i) => {
                     const d = new Date();
                     d.setDate(d.getDate() - (6 - i));
                     return d.toISOString().split('T')[0];
                 });
                 
-                // Noms des jours pour le graphique
                 const dayNames = last7Days.map(dateStr => new Date(dateStr).toLocaleDateString('fr-FR', { weekday: 'short' }));
 
-                // Remplissage des données jour par jour
                 const calData = last7Days.map(date => {
                     const m = data.find(x => x.date.startsWith(date));
                     return m?.calories_burned ? Number(m.calories_burned) : 0;
@@ -102,7 +151,7 @@ export default function DashboardPage() {
                     return m?.active_minute ? Number(m.active_minute) : 0;
                 });
 
-                // 5. Calcul des totaux
+                // Calcul des totaux
                 const totalCal = calData.reduce((a, b) => a + b, 0);
                 const totalMin = minData.reduce((a, b) => a + b, 0);
                 const totalStp = stpData.reduce((a, b) => a + b, 0);
@@ -112,7 +161,7 @@ export default function DashboardPage() {
                     ? data.filter(m => m.weight !== null)[1].weight 
                     : null;
 
-                // 6. Calcul des tendances (Aujourd'hui vs Hier)
+                // Calcul des tendances
                 const getChange = (today: number, yesterday: number) => {
                     if (!yesterday && !today) return { text: '--', type: 'neutral' };
                     if (!yesterday) return { text: '+100%', type: 'positive' };
@@ -126,14 +175,12 @@ export default function DashboardPage() {
                 let weightChange = { text: '--', type: 'neutral' };
                 if (latestWeight && previousWeight && latestWeight !== previousWeight) {
                     const diff = (latestWeight - previousWeight).toFixed(1);
-                    // Pour le poids, une baisse est "positive" en général dans une app fitness
                     weightChange = {
                         text: Number(diff) > 0 ? `+${diff}kg` : `${diff}kg`,
                         type: Number(diff) > 0 ? 'negative' : 'positive' 
                     };
                 }
 
-                // 7. Mise à jour de l'état global
                 setWeeklyData({
                     totalMinutes: totalMin,
                     totalCalories: totalCal,
@@ -149,15 +196,139 @@ export default function DashboardPage() {
                 });
 
             } catch (error) {
-                console.error("Erreur récupération données dashboard:", error);
-                setHasTodayMetric(true); // Fallback silencieux
+                console.error("Erreur récupération données:", error);
+                setHasTodayMetric(true);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchData();
     }, [user]);
 
-    // --- CONSTRUCTION DES STATS DYNAMIQUES ---
+    // --- FONCTIONS ONBOARDING ---
+    const handleSaveOnboarding = async () => {
+        if (selectedGoals.length === 0) {
+            toast.error("Veuillez sélectionner au moins un objectif.");
+            return;
+        }
+
+        setIsSavingOnboarding(true);
+        try {
+            await axios.post('/api/users/mutate', {
+                mutate: [{
+                    operation: 'update',
+                    key: user?.id,
+                    relations: {
+                        goals: selectedGoals.map(id => ({ operation: 'attach', key: id })),
+                        ...(selectedConstraints.length > 0 && {
+                            constraints: selectedConstraints.map(id => ({ operation: 'attach', key: id }))
+                        })
+                    }
+                }]
+            });
+            
+            toast.success("Profil complété avec succès !");
+            window.location.reload(); // Recharge pour afficher le dashboard
+        } catch (err) {
+            console.error("Erreur sauvegarde onboarding:", err);
+            toast.error("Une erreur est survenue lors de l'enregistrement.");
+            setIsSavingOnboarding(false);
+        }
+    };
+
+    const toggleArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, id: string) => {
+        setter(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
+    // --- SKELETON DE CHARGEMENT ---
+    if (isLoading) {
+        return (
+            <main className="max-w-7xl mx-auto space-y-8 animate-pulse">
+                <div className="h-10 bg-slate-200 rounded w-1/3"></div>
+                <div className="h-32 bg-slate-200 rounded-3xl"></div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="h-32 bg-slate-200 rounded-2xl"></div><div className="h-32 bg-slate-200 rounded-2xl"></div>
+                    <div className="h-32 bg-slate-200 rounded-2xl"></div><div className="h-32 bg-slate-200 rounded-2xl"></div>
+                </div>
+            </main>
+        );
+    }
+
+    // ==========================================
+    // VUE ONBOARDING (Si l'utilisateur n'a pas d'objectifs)
+    // ==========================================
+    if (needsOnboarding) {
+        return (
+            <main className="max-w-3xl mx-auto animate-in fade-in duration-500 py-10">
+                <div className="text-center mb-10">
+                    <div className="inline-flex items-center justify-center p-3 bg-purple-50 text-[#7B3FF2] rounded-2xl mb-4">
+                        <Target className="h-8 w-8" />
+                    </div>
+                    <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Bienvenue, {user?.first_name} !</h1>
+                    <p className="text-slate-500">Pour que l'IA puisse générer votre programme sur-mesure, parlez-nous un peu de vous.</p>
+                </div>
+
+                <div className="bg-white border border-slate-100 shadow-sm rounded-3xl p-6 sm:p-10 space-y-10">
+                    {/* Objectifs */}
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-[#7B3FF2]" /> Quels sont vos objectifs ? <span className="text-red-500">*</span>
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {availableGoals.map(goal => {
+                                const isSelected = selectedGoals.includes(goal.id);
+                                return (
+                                    <button 
+                                        key={goal.id} 
+                                        onClick={() => toggleArrayItem(setSelectedGoals, goal.id)}
+                                        className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all text-left ${isSelected ? 'border-[#7B3FF2] bg-purple-50/50' : 'border-slate-100 hover:border-slate-200 bg-white'}`}
+                                    >
+                                        <span className={`font-bold ${isSelected ? 'text-[#7B3FF2]' : 'text-slate-700'}`}>{goal.name || goal.goal}</span>
+                                        {isSelected && <CheckCircle2 className="h-5 w-5 text-[#7B3FF2]" />}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Contraintes */}
+                    <div>
+                        <h2 className="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
+                            <AlertTriangle className="h-5 w-5 text-orange-500" /> Avez-vous des contraintes ou allergies ?
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {availableConstraints.map(constraint => {
+                                const isSelected = selectedConstraints.includes(constraint.id);
+                                return (
+                                    <button 
+                                        key={constraint.id} 
+                                        onClick={() => toggleArrayItem(setSelectedConstraints, constraint.id)}
+                                        className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all text-left ${isSelected ? 'border-orange-500 bg-orange-50/50' : 'border-slate-100 hover:border-slate-200 bg-white'}`}
+                                    >
+                                        <span className={`font-bold ${isSelected ? 'text-orange-600' : 'text-slate-700'}`}>{constraint.name}</span>
+                                        {isSelected && <CheckCircle2 className="h-5 w-5 text-orange-500" />}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <button 
+                        onClick={handleSaveOnboarding}
+                        disabled={isSavingOnboarding}
+                        className="w-full py-4 bg-[#7B3FF2] hover:bg-[#6830d1] text-white rounded-xl font-bold transition-colors shadow-lg shadow-purple-200 flex justify-center items-center gap-2 disabled:opacity-50"
+                    >
+                        {isSavingOnboarding ? 'Configuration en cours...' : 'Générer mon profil IA'} <ArrowRight className="h-5 w-5" />
+                    </button>
+                </div>
+            </main>
+        );
+    }
+
+    // ==========================================
+    // VUE NORMALE DU DASHBOARD
+    // ==========================================
     const stats = [
         { id: 1, name: 'Minutes actives (7j)', value: weeklyData.totalMinutes.toString(), change: weeklyData.minChange.text, changeType: weeklyData.minChange.type, icon: Activity, color: 'text-blue-700', bgColor: 'bg-blue-50' },
         { id: 2, name: 'Calories brûlées (7j)', value: weeklyData.totalCalories.toLocaleString('fr-FR'), change: weeklyData.calChange.text, changeType: weeklyData.calChange.type, icon: Flame, color: 'text-orange-600', bgColor: 'bg-orange-50' },
@@ -171,13 +342,12 @@ export default function DashboardPage() {
         { id: 3, title: 'Endurance Rameur', duration: '25 min', intensity: 'Moyenne', image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=600&h=400' },
     ];
 
-    // --- GRAPH DYNAMIQUE ---
     const chartData = {
-        labels: weeklyData.chartLabels, // Jours dynamiques
+        labels: weeklyData.chartLabels,
         datasets: [
             {
                 label: 'Calories',
-                data: weeklyData.chartCalories, // Données réelles
+                data: weeklyData.chartCalories,
                 borderColor: '#7B3FF2',
                 backgroundColor: 'rgba(123, 63, 242, 0.05)',
                 borderWidth: 3,
@@ -190,7 +360,7 @@ export default function DashboardPage() {
             },
             {
                 label: 'Pas',
-                data: weeklyData.chartSteps, // Données réelles
+                data: weeklyData.chartSteps,
                 borderColor: '#3b82f6',
                 borderWidth: 3,
                 tension: 0.4,
@@ -233,7 +403,6 @@ export default function DashboardPage() {
                 </p>
             </header>
 
-            {/* --- LA CARD PROMPT : Apparaît si aucun bilan trouvé pour la date du jour --- */}
             {!hasTodayMetric && (
                 <section className="bg-gradient-to-br from-[#7B3FF2] to-[#5a24c5] rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-[#7B3FF2]/20 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transform transition-all hover:scale-[1.01]">
                     <div className="absolute -right-6 -top-10 opacity-10 pointer-events-none">
@@ -272,7 +441,6 @@ export default function DashboardPage() {
                                 <div className={`p-3 rounded-2xl ${stat.bgColor} ${stat.color}`}>
                                     <stat.icon className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
                                 </div>
-                                {/* Changement dynamique de la couleur de la progression */}
                                 <span className={`text-sm font-bold ${
                                     stat.changeType === 'positive' ? 'text-emerald-600' : 
                                     stat.changeType === 'negative' ? 'text-red-500' : 
@@ -324,7 +492,6 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
                 
-                {/* --- GRAPH CHART.JS DYNAMIQUE --- */}
                 <section className="xl:col-span-2 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col" aria-labelledby="chart-heading">
                     <div className="flex items-center justify-between mb-8">
                         <h2 id="chart-heading" className="text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -346,7 +513,6 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
-                {/* --- ACTIONS RAPIDES --- */}
                 <section className="space-y-4 sm:space-y-6 flex flex-col justify-between" aria-labelledby="actions-heading">
                     <h2 id="actions-heading" className="sr-only">Actions rapides</h2>
 
