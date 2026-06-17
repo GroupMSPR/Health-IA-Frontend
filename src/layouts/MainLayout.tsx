@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, Link } from 'react-router-dom';
 import { Home, Activity, Dumbbell, Apple, Camera, User, LogOut, Lightbulb, Sparkles, Settings, ChartColumnIncreasing } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -39,10 +39,11 @@ export default function MainLayout() {
 
     const mobileNavItems = [
         { name: "Home", path: "/dashboard", icon: Home },
-        { name: "Exercises", path: "/exercises", icon: Dumbbell },
+        { name: "Metrics", path: "/my-metrics", icon: Activity },
         { name: "Scan", path: "/food-scan", icon: Camera, isPrimary: true },
+        { name: "Exercises", path: "/exercises", icon: Dumbbell },
         { name: "Foods", path: "/foods", icon: Apple },
-        { name: "Profile", path: "/account/profile", icon: User },
+        
     ];
 
     const userInitials = user 
@@ -55,14 +56,18 @@ export default function MainLayout() {
             {/* DESKTOP & TABLETTE */}
             <aside className="hidden md:flex flex-col fixed inset-y-0 left-0 bg-white border-r border-slate-100 z-50 transition-all duration-300 w-20 lg:w-64">
                 
-                <div className="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-50">
+                <Link 
+                    to="/dashboard" 
+                    aria-label="Retour à l'accueil Health AI Coach"
+                    className="w-full h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-50 hover:bg-slate-50 transition-colors focus:outline-none focus-visible:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-500"
+                >
                     <div className="bg-blue-100 p-2 rounded-xl text-blue-600 shrink-0">
                         <Activity className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
                     </div>
                     <span className="hidden lg:block ml-3 font-bold text-xl text-slate-900 tracking-tight whitespace-nowrap">
                         Health AI Coach
                     </span>
-                </div>
+                </Link>
 
                 <nav className="flex-1 overflow-y-auto py-6 px-2 lg:px-4 custom-scrollbar">
                     {NAV_CATEGORIES.map((category, index) => (
@@ -118,12 +123,16 @@ export default function MainLayout() {
             {/* MAIN */}
             <main className="flex-1 flex flex-col min-w-0 md:ml-20 lg:ml-64 pb-20 md:pb-0 transition-all duration-300">
                 <header className="md:hidden h-16 bg-white border-b border-slate-100 flex items-center justify-between px-4 sticky top-0 z-40">
-                    <div className="flex items-center gap-2">
-                        <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
-                            <Activity className="h-5 w-5" strokeWidth={2.5} />
+                    <Link 
+                        to="/dashboard" 
+                        aria-label="Retour à l'accueil"
+                        className="flex items-center gap-2 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg p-1 -ml-1"
+                    >
+                        <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600 shrink-0">
+                            <Activity className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
                         </div>
                         <span className="font-bold text-lg text-slate-900">Health AI Coach</span>
-                    </div>
+                    </Link>
                     <div className="h-8 w-8 rounded-full bg-[#7B3FF2] text-white flex items-center justify-center font-bold text-xs shadow-sm">
                         {userInitials}
                     </div>
