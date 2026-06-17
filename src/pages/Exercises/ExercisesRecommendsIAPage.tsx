@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import axios from '../../lib/axios';
 import { toast } from 'sonner';
-// IMPORT À ADAPTER SELON L'EMPLACEMENT DE TON CONTEXTE
 import { useAuth } from '../../contexts/AuthContext'; 
 
 interface Exercise {
@@ -24,14 +23,12 @@ interface Exercise {
     difficulty_level: string;
     target_muscle: string;
     recommended_duration_seconds: number;
-    // Donnée fusionnée depuis l'IA
     ai_confidence?: number; 
 }
 
 const DEFAULT_EXERCISE_IMAGE = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1000";
 
 export default function ExerciseIARecommendPage() {
-    // Récupération de l'utilisateur courant depuis ton AuthContext
     const { user } = useAuth();
     
     const [recommendations, setRecommendations] = useState<Exercise[]>([]);
@@ -39,74 +36,85 @@ export default function ExerciseIARecommendPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // On attend que les données de l'utilisateur soient chargées
         if (!user) return;
 
-        const fetchRecommendations = async (user: any) => {
+        const fetchRecommendations = async () => {
             setIsLoading(true);
             setError(null);
 
             try {
-                // 1. Préparation du Body (Payload) avec les données du User
-                // Calcul du BMI de secours si non fourni directement dans le user
+                // 1. Calcul des données nécessaires au modèle d'IA
                 let calculatedBmi = user.bmi;
                 if (!calculatedBmi && user.weight && user.height) {
                     calculatedBmi = user.weight / Math.pow(user.height / 100, 2);
                 }
 
+                // Calcul de l'âge (souvent requis par les modèles IA au lieu de la date complète)
+                let age = 25; 
+                if (user.birthdate) {
+                    const birthYear = new Date(user.birthdate).getFullYear();
+                    const currentYear = new Date().getFullYear();
+                    age = currentYear - birthYear;
+                }
+
                 const aiPayload = {
-                    physical_activity_level: user.physical_activity_level || "moderate",
+                    age: age,
                     bmi: parseFloat((calculatedBmi || 22.0).toFixed(1)),
-                    birthdate: user.birthdate || "2000-01-01",
-                    // Respect de la clé exacte demandée par l'API (avec la faute de frappe "categorie")
-                    favorite_exercise_categorie: user.favorite_exercise_category || user.favorite_exercise_categorie || "cardio"
+                    physical_activity_level: user.physical_activity_level || "moderate",
+                    favorite_exercise_category: user.favorite_exercise_category || user.favorite_exercise_category || "Cardio"
                 };
 
                 // 2. Appel à l'IA pour obtenir les prédictions
                 const aiResponse = await axios.post('/api/ai/recommend', aiPayload);
-                const predictions = aiResponse.data?.predictions || [];
+                
+                // Le SDK-IA peut renvoyer dans data.predictions ou data.data.predictions
+                const predictions = aiResponse.data?.predictions || aiResponse.data?.data?.predictions || [];
 
                 if (!Array.isArray(predictions) || predictions.length === 0) {
-                    throw new Error("L'IA n'a retourné aucune prédiction.");
+                    throw new Error("L'IA n'a retourné aucune prédiction avec ce profil.");
                 }
 
-                // On prend le Top 5
+                // On prend le Top 5 des prédictions
                 const top5Predictions = predictions.slice(0, 5);
                 const exerciseNames = top5Predictions.map((p: any) => p.exercise);
 
-                // 3. Récupération des détails complets depuis la BDD (Lomkit)
-                const dbResponse = await axios.post('/api/exercises/search', {
-                    search: {
-                        filters: [
-                            { field: 'name', operator: 'in', value: exerciseNames }
-                        ]
-                    }
-                });
-
-                const dbExercises = dbResponse.data?.data || dbResponse.data || [];
+                // 3. Récupération des détails complets depuis Lomkit
+                let dbExercises: any[] = [];
+                if (exerciseNames.length > 0) {
+                    const dbResponse = await axios.post('/api/exercises/search', {
+                        search: {
+                            filters: [
+                                { field: 'name', operator: 'in', value: exerciseNames }
+                            ]
+                        }
+                    });
+                    dbExercises = dbResponse.data?.data || dbResponse.data || [];
+                }
 
                 // 4. Fusion des données IA (confidence) avec les données de la BDD
                 const finalRecommendations = top5Predictions.map((pred: any) => {
-                    // On cherche l'exercice complet correspondant
-                    const dbData = dbExercises.find((ex: any) => 
-                        ex.name.toLowerCase() === pred.exercise.toLowerCase()
-                    );
+                    const dbData = dbExercises.find((ex: any) => {
+                        // SÉCURITÉ : On vérifie que les noms existent bien avant de faire un toLowerCase()
+                        const dbName = ex?.name || '';
+                        const predName = pred?.exercise || '';
+                        return dbName.toLowerCase() === predName.toLowerCase();
+                    });
 
                     if (dbData) {
                         return {
                             ...dbData,
-                            ai_confidence: pred.confidence
+                            ai_confidence: pred?.confidence
                         };
                     } else {
-                        // Fallback : Si l'exercice généré par l'IA n'existe pas en BDD
+                        // L'IA a inventé ou trouvé un exercice qui n'est pas dans la BDD
                         return {
                             id: `ai-mock-${Math.random()}`,
-                            name: pred.exercise,
-                            category: "Non catégorisé",
+                            name: pred?.exercise || 'Exercice IA', // Sécurité ici aussi
+                            category: "Généré par l'IA",
                             difficulty_level: "Inconnu",
                             target_muscle: "Multiples",
                             recommended_duration_seconds: 1200,
-                            ai_confidence: pred.confidence
+                            ai_confidence: pred?.confidence
                         };
                     }
                 });
@@ -114,34 +122,32 @@ export default function ExerciseIARecommendPage() {
                 setRecommendations(finalRecommendations);
 
             } catch (err: any) {
-                console.error("Erreur lors de la récupération des recommandations:", err);
+                console.error("Erreur IA Recommendations:", err);
                 setError("Impossible de générer vos recommandations pour le moment.");
-                toast.error("Échec de la connexion à l'IA.");
+                toast.error("Échec de l'analyse IA. Vérifiez que votre serveur IA est en ligne.");
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchRecommendations(user);
-    }, [user]); // Le useEffect se relance si le user change
+        fetchRecommendations();
+    }, [user]);
 
     const getDifficultyTranslation = (difficulty: string) => {
-        switch (difficulty) {
-            case 'Beginner': return 'Débutant';
-            case 'Intermediate': return 'Intermédiaire';
-            case 'Advanced': return 'Avancé';
-            case 'Inconnu': return 'Adaptatif';
-            default: return difficulty || 'N/A';
-        }
+        const diffLow = difficulty?.toLowerCase() || '';
+        if (diffLow.includes('beginner') || diffLow.includes('débutant')) return 'Débutant';
+        if (diffLow.includes('intermediate') || diffLow.includes('intermédiaire')) return 'Intermédiaire';
+        if (diffLow.includes('advanced') || diffLow.includes('avancé')) return 'Avancé';
+        if (diffLow.includes('inconnu')) return 'Adaptatif';
+        return difficulty || 'N/A';
     };
 
     const getDifficultyStyles = (difficulty: string) => {
-        switch (difficulty) {
-            case 'Beginner': return 'bg-green-100 text-green-800 border-green-200';
-            case 'Intermediate': return 'bg-orange-100 text-orange-800 border-orange-200';
-            case 'Advanced': return 'bg-red-100 text-red-800 border-red-200';
-            default: return 'bg-slate-100 text-slate-800 border-slate-200';
-        }
+        const diffLow = difficulty?.toLowerCase() || '';
+        if (diffLow.includes('beginner') || diffLow.includes('débutant')) return 'bg-green-100 text-green-800 border-green-200';
+        if (diffLow.includes('intermediate') || diffLow.includes('intermédiaire')) return 'bg-orange-100 text-orange-800 border-orange-200';
+        if (diffLow.includes('advanced') || diffLow.includes('avancé')) return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-slate-100 text-slate-800 border-slate-200';
     };
 
     return (
@@ -169,7 +175,7 @@ export default function ExerciseIARecommendPage() {
                 </p>
             </header>
 
-            {isLoading || !user ? (
+            {isLoading ? (
                 <div className="space-y-4" aria-busy="true" aria-label="Chargement des recommandations">
                     {[1, 2, 3, 4, 5].map((skeleton) => (
                         <div key={skeleton} className="bg-white border border-slate-100 shadow-sm rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row gap-6 animate-pulse">
@@ -190,7 +196,7 @@ export default function ExerciseIARecommendPage() {
                     <AlertTriangle className="h-8 w-8" />
                     <div>
                         <p className="font-bold text-lg">{error}</p>
-                        <p className="text-sm mt-1 opacity-80">Assurez-vous que le serveur est bien démarré et que la route /api/ai/recommend est accessible.</p>
+                        <p className="text-sm mt-1 opacity-80">Assurez-vous que le serveur est bien démarré et que la route IA est accessible.</p>
                     </div>
                 </div>
             ) : recommendations.length === 0 ? (
@@ -203,8 +209,10 @@ export default function ExerciseIARecommendPage() {
                 <div className="space-y-4 sm:space-y-6">
                     {recommendations.map((exercise, index) => {
                         const durationMinutes = Math.max(1, Math.round((exercise.recommended_duration_seconds || 60) / 60));
-                        // L'API renvoie des scores très bas (ex: 0.115). On le met en valeur de façon propre.
-                        const aiScore = exercise.ai_confidence ? (exercise.ai_confidence * 100).toFixed(1) : null;
+                        
+                        // Si le score renvoyé est une probabilité (ex: 0.85), on le passe en % (85%). Si c'est déjà 85, on garde 85.
+                        const rawScore = exercise.ai_confidence || 0;
+                        const aiScore = rawScore <= 1 ? (rawScore * 100).toFixed(1) : rawScore.toFixed(1);
 
                         return (
                             <article 
@@ -218,7 +226,6 @@ export default function ExerciseIARecommendPage() {
                                         alt={exercise.name} 
                                         className="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-700"
                                     />
-                                    {/* Numéro de la recommandation stylisé */}
                                     <div className="absolute top-4 left-4 w-8 h-8 bg-black/60 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 shadow-lg text-white font-black text-sm">
                                         {index + 1}
                                     </div>
@@ -255,24 +262,22 @@ export default function ExerciseIARecommendPage() {
                                             <Clock className="h-4 w-4 text-orange-500" />
                                             <span className="font-medium">{durationMinutes} min</span>
                                         </div>
-                                        {aiScore && (
-                                            <div className="flex items-center gap-2" title="Score de recommandation IA">
+                                        {exercise.ai_confidence && (
+                                            <div className="flex items-center gap-2" title="Précision de l'IA">
                                                 <Activity className="h-4 w-4 text-[#7B3FF2]" />
-                                                <span className="font-bold text-[#7B3FF2]">Score IA : {aiScore}</span>
+                                                <span className="font-bold text-[#7B3FF2]">Pertinence: {aiScore}%</span>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* Si l'ID contient 'ai-mock', c'est que l'IA a inventé un exercice qui n'est pas dans la BDD */}
                                     {exercise.id.startsWith('ai-mock') && (
                                         <div className="mt-4 flex items-start gap-2 p-3 bg-amber-50 rounded-xl text-amber-700 text-xs font-medium border border-amber-100">
                                             <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                                            <p>Cet exercice suggéré par l'IA ne possède pas encore de page de détails complète dans votre base de données.</p>
+                                            <p>Cet exercice suggéré par l'IA ne possède pas encore de détails complets dans votre catalogue.</p>
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Bouton d'action à droite (desktop) / en bas (mobile) */}
                                 <div className="p-5 sm:p-6 bg-slate-50 border-t sm:border-t-0 sm:border-l border-slate-100 flex items-center justify-center shrink-0">
                                     <Link 
                                         to={exercise.id.startsWith('ai-mock') ? '#' : `/exercises/${exercise.id}`}
