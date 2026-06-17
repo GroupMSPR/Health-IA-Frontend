@@ -13,13 +13,12 @@ import {
     MessageSquare
 } from 'lucide-react';
 import { toast } from 'sonner';
-// import axios from '../../lib/axios';
+import axios from '../../lib/axios'; // <-- Décommenté !
 
 export default function FoodScanIAPage() {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
     
-    // Références pour la caméra en direct
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     
@@ -28,14 +27,11 @@ export default function FoodScanIAPage() {
     const [isScanning, setIsScanning] = useState(false);
     const [foodQuery, setFoodQuery] = useState('');
     
-    // NOUVEL ÉTAT : Contrôle l'affichage de la section texte
     const [showTextAnalysis, setShowTextAnalysis] = useState(false);
     
-    // États pour gérer la caméra WebRTC
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [stream, setStream] = useState<MediaStream | null>(null);
 
-    // Nettoyage : Coupe la caméra si l'utilisateur quitte la page
     useEffect(() => {
         return () => {
             if (stream) {
@@ -44,14 +40,12 @@ export default function FoodScanIAPage() {
         };
     }, [stream]);
 
-    // On attend que React ait fini d'afficher la balise <video> pour y brancher le flux
     useEffect(() => {
         if (isCameraActive && videoRef.current && stream) {
             videoRef.current.srcObject = stream;
         }
     }, [isCameraActive, stream]);
 
-    // --- LOGIQUE FICHIER CLASSIQUE ---
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -61,7 +55,7 @@ export default function FoodScanIAPage() {
             }
             setSelectedImage(file);
             setPreviewUrl(URL.createObjectURL(file));
-            setShowTextAnalysis(false); // Cache la section texte si on upload une image
+            setShowTextAnalysis(false); 
         }
     };
 
@@ -95,18 +89,16 @@ export default function FoodScanIAPage() {
             }
             setSelectedImage(file);
             setPreviewUrl(URL.createObjectURL(file));
-            setShowTextAnalysis(false); // Cache la section texte
+            setShowTextAnalysis(false); 
         }
     };
 
-    // --- LOGIQUE CAMÉRA EN DIRECT CORRIGÉE (WebRTC) ---
     const startCamera = async () => {
         setIsCameraActive(true);
-        setShowTextAnalysis(false); // Cache la section texte
+        setShowTextAnalysis(false); 
         
         try {
             let mediaStream: MediaStream;
-            
             try {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'environment' } 
@@ -174,52 +166,36 @@ export default function FoodScanIAPage() {
         }
     };
 
-    // --- SOUMISSION À L'IA (MOCK POUR TEST) ---
+    // --- SOUMISSION À L'IA (IMAGE) ---
     const handleScanSubmit = async () => {
         if (!selectedImage) return;
 
         setIsScanning(true);
         
         try {
-            /* === VRAI CODE COMMENTÉ POUR PLUS TARD ===
             const formData = new FormData();
             formData.append('image', selectedImage);
 
-            const response = await axios.post('/api/ia/analyse_meal', formData, {
+            const response = await axios.post('/api/ai/analyze-meal', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const aiResult = response.data;
-            */
-
-            // === FAUX CODE (MOCK) POUR TESTER ===
-            await new Promise(resolve => setTimeout(resolve, 2500)); 
-            const aiResult = {
-                name: "Pizza Margherita (Part)",
-                category: "Snacks",
-                image: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=1000",
-                calories: 266,
-                protein: 11,
-                carbohydrates: 33,
-                fat: 10,
-                fiber: 2.3,
-                sugars: 3.6,
-                sodium: 598,
-                cholesterol: 17,
-                confidence: 98
-            };
+            
+            // On récupère le résultat envoyé par le SDK-IA
+            const aiResult = response.data.data || response.data;
 
             toast.success("Analyse terminée !");
-            navigate('/food-scan/result', { state: { aiResult } });
+            // On passe aiResult ET l'URL de l'image scannée pour l'afficher sur la page suivante
+            navigate('/food-scan/result', { state: { aiResult, scannedImageUrl: previewUrl } });
             
         } catch (error) {
             console.error("Erreur de l'IA:", error);
-            toast.error("Impossible d'analyser l'aliment. Veuillez réessayer.");
+            toast.error("Impossible d'analyser l'aliment. Vérifiez votre connexion.");
         } finally {
             setIsScanning(false);
         }
     };
 
-    // --- SOUMISSION À L'IA PAR TEXTE (MOCK) ---
+    // --- SOUMISSION À L'IA (TEXTE) ---
     const handleTextSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!foodQuery.trim()) return;
@@ -227,27 +203,15 @@ export default function FoodScanIAPage() {
         setIsScanning(true);
         
         try {
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            // À adapter si ton back attend 'query', 'text', etc.
+            const response = await axios.post('/api/ai/analyze-meal', {
+                description: foodQuery 
+            });
             
-            const formattedName = foodQuery.charAt(0).toUpperCase() + foodQuery.slice(1);
-            
-            const aiResult = {
-                name: formattedName,
-                category: "Meals",
-                image: null,
-                calories: 420,
-                protein: 25,
-                carbohydrates: 45,
-                fat: 15,
-                fiber: 4,
-                sugars: 3,
-                sodium: 450,
-                cholesterol: 30,
-                confidence: 92
-            };
+            const aiResult = response.data.data || response.data;
 
             toast.success("Analyse textuelle terminée !");
-            navigate('/food-scan/result', { state: { aiResult } });
+            navigate('/food-scan/result', { state: { aiResult, scannedImageUrl: null } });
             
         } catch (error) {
             console.error("Erreur de l'IA textuelle:", error);
@@ -292,7 +256,6 @@ export default function FoodScanIAPage() {
 
             <section className="bg-white border border-slate-100 shadow-sm rounded-3xl p-6 sm:p-8">
                 
-                {/* 1. ÉTAT : CAMÉRA ALLUMÉE */}
                 {isCameraActive ? (
                     <div className="relative rounded-2xl overflow-hidden bg-slate-900 aspect-[3/4] sm:aspect-video flex items-center justify-center shadow-inner">
                         <video 
@@ -309,7 +272,6 @@ export default function FoodScanIAPage() {
                                 <button 
                                     onClick={stopCamera} 
                                     className="p-2 bg-black/40 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-colors"
-                                    aria-label="Fermer la caméra"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>
@@ -319,7 +281,6 @@ export default function FoodScanIAPage() {
                                 <button 
                                     onClick={capturePhoto} 
                                     className="p-4 bg-white hover:bg-slate-200 rounded-full shadow-lg transition-colors border-4 border-slate-300 flex items-center justify-center group"
-                                    aria-label="Prendre la photo"
                                 >
                                     <Camera className="h-8 w-8 text-slate-900 group-hover:scale-110 transition-transform" />
                                 </button>
@@ -328,16 +289,12 @@ export default function FoodScanIAPage() {
                     </div>
                 ) : 
                 
-                // 2. ÉTAT : AUCUNE IMAGE SÉLECTIONNÉE (Zone d'upload)
                 !previewUrl ? (
                     <div 
                         className="border-2 border-dashed border-slate-200 hover:border-[#7B3FF2] bg-slate-50/50 hover:bg-purple-50/30 transition-colors rounded-2xl p-8 sm:p-12 text-center cursor-pointer group"
                         onClick={triggerFileSelect}
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
-                        role="button"
-                        tabIndex={0}
-                        aria-label="Sélectionner ou glisser une image à analyser"
                     >
                         <div className="mx-auto w-16 h-16 bg-white border border-slate-100 shadow-sm rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                             <UploadCloud className="h-8 w-8 text-slate-400 group-hover:text-[#7B3FF2] transition-colors" />
@@ -370,7 +327,6 @@ export default function FoodScanIAPage() {
                     </div>
                 ) : 
                 
-                // 3. ÉTAT : IMAGE PRÊTE À ÊTRE SCANNÉE (Aperçu)
                 (
                     <div className="space-y-6">
                         <div className="relative rounded-2xl overflow-hidden bg-slate-900 aspect-[3/4] sm:aspect-video flex items-center justify-center group shadow-inner">
@@ -389,8 +345,7 @@ export default function FoodScanIAPage() {
                             {!isScanning && (
                                 <button 
                                     onClick={handleClearImage}
-                                    className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
-                                    aria-label="Retirer l'image"
+                                    className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-red-500 text-white rounded-full backdrop-blur-md transition-all shadow-sm"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>
@@ -400,10 +355,10 @@ export default function FoodScanIAPage() {
                         <button
                             onClick={handleScanSubmit}
                             disabled={isScanning}
-                            className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                            className={`w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all shadow-sm ${
                                 isScanning 
                                     ? 'bg-slate-300 cursor-not-allowed' 
-                                    : 'bg-[#7B3FF2] hover:bg-[#6830d1] focus-visible:ring-[#7B3FF2] shadow-[#7B3FF2]/20 hover:shadow-md'
+                                    : 'bg-[#7B3FF2] hover:bg-[#6830d1] shadow-[#7B3FF2]/20 hover:shadow-md'
                             }`}
                         >
                             {isScanning ? (
@@ -420,16 +375,14 @@ export default function FoodScanIAPage() {
                         </button>
                     </div>
                 )}
-
             </section>
 
-            {/* --- LE BOUTON D'ORIGINE QUI DÉCLENCHE L'OUVERTURE --- */}
             {!isCameraActive && !previewUrl && !showTextAnalysis && (
                 <section className="text-center pt-4 animate-in fade-in zoom-in-95 duration-300">
                     <p className="text-sm text-slate-500 font-medium mb-3">L'aliment n'est pas reconnu ou vous n'avez pas de photo ?</p>
                     <button 
                         onClick={() => setShowTextAnalysis(true)}
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-300 hover:border-slate-500 hover:bg-slate-50 text-slate-700 rounded-xl font-bold text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2]"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-300 hover:border-slate-500 hover:bg-slate-50 text-slate-700 rounded-xl font-bold text-sm transition-colors"
                     >
                         <FileEdit className="h-4 w-4 text-slate-400" />
                         <span>Entrer les informations manuellement</span>
@@ -437,11 +390,8 @@ export default function FoodScanIAPage() {
                 </section>
             )}
 
-            {/* --- LA SECTION CACHÉE QUI GLISSE VERS LE BAS --- */}
             {!isCameraActive && !previewUrl && showTextAnalysis && (
                 <div className="space-y-6 animate-in slide-in-from-top-6 fade-in duration-500">
-                    
-                    {/* Le bloc Analyse par description */}
                     <section className="bg-white border border-slate-100 shadow-sm rounded-3xl p-6 sm:p-8">
                         <div className="flex items-start gap-4">
                             <div className="p-3 bg-blue-50 text-blue-500 rounded-xl hidden sm:block">
@@ -465,7 +415,7 @@ export default function FoodScanIAPage() {
                                             placeholder="Ex: Un bol de riz avec saumon et avocat..."
                                             className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-[#7B3FF2] focus:ring-1 focus:ring-[#7B3FF2] transition-colors"
                                             disabled={isScanning}
-                                            autoFocus // Focus automatique pour faciliter la frappe
+                                            autoFocus 
                                         />
                                     </div>
                                     <button 
@@ -485,11 +435,10 @@ export default function FoodScanIAPage() {
                         </div>
                     </section>
 
-                    {/* Le lien de secours vers la création vraiment manuelle sans IA */}
                     <section className="text-center pt-2 pb-4">
                         <Link 
                             to="/food/create" 
-                            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 hover:bg-slate-50 text-slate-500 hover:text-slate-700 rounded-xl font-medium text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2]"
+                            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 hover:bg-slate-50 text-slate-500 hover:text-slate-700 rounded-xl font-medium text-sm transition-colors"
                         >
                             <FileEdit className="h-4 w-4" />
                             <span className="underline">Créer un aliment manuellement sans utiliser l'IA</span>
