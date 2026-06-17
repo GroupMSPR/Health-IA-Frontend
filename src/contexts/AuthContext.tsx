@@ -2,12 +2,20 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import axios from '../lib/axios';
 
-interface User {
+export interface User {
     id: string;
     first_name: string;
     last_name: string;
     email: string;
-    weight: number;
+    weight?: number | null;
+    height?: number | null;
+    bmi?: number | null;
+    birthdate?: string | null;
+    gender?: string | null;
+    physical_activity_level?: string | null;
+    favorite_exercise_category?: string | null;
+    body_fat_pct?: number | null;
+    daily_caloric_intake?: number | null;
 }
 
 interface AuthContextType {
