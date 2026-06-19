@@ -25,6 +25,7 @@ import axios from '../../lib/axios';
 // Interface strictement alignée sur FoodResource.php
 interface Food {
     id: string;
+    user_id: string;
     name: string;
     category: string;
     image?: string;
@@ -38,11 +39,11 @@ interface Food {
     cholesterol: number;
 }
 
-const filters = ['All', 'Meat', 'Vegetables', 'Fruits', 'Dairy', 'Grains', 'Snacks'];
+const filters = ['All', 'Meat & Fish', 'Vegetables', 'Fruits', 'Dairy', 'Grains', 'Snacks'];
 
 const filterTranslations: Record<string, string> = {
     'All': 'Tous',
-    'Meat': 'Viandes & Poissons',
+    'Meat & Fish': 'Viandes & Poissons',
     'Vegetables': 'Légumes',
     'Fruits': 'Fruits',
     'Dairy': 'Produits laitiers',
@@ -195,7 +196,7 @@ export default function FoodsMainPage() {
 
     const getCategoryStyles = (category: string) => {
         const cat = category.toLowerCase();
-        if (cat.includes('meat') || cat.includes('viande')) return 'bg-red-100 text-red-800';
+        if (cat.includes('meat & fish') || cat.includes('viande')) return 'bg-red-100 text-red-800';
         if (cat.includes('fruit') || cat.includes('vegetable') || cat.includes('légume')) return 'bg-green-100 text-green-800';
         if (cat.includes('dairy') || cat.includes('lait')) return 'bg-blue-100 text-blue-800';
         if (cat.includes('grain') || cat.includes('céréale')) return 'bg-amber-100 text-amber-800';

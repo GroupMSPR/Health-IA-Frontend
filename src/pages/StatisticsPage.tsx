@@ -85,7 +85,7 @@ export default function StatisticsPage() {
                             { field: 'user_id', operator: '=', value: user.id },
                             { field: 'date', operator: '>=', value: pastDateString }
                         ],
-                        limit: 100 // S'assurer de tout récupérer
+                        limit: 50
                     }
                 });
 
@@ -210,7 +210,9 @@ export default function StatisticsPage() {
                 borderWidth: 2,
                 tension: 0.4,
                 spanGaps: true,
-                pointRadius: 0,
+                pointRadius: 4,
+                pointBackgroundColor: '#ffffff',
+                pointBorderWidth: 2,
             },
             {
                 label: 'BPM Repos',
@@ -220,7 +222,9 @@ export default function StatisticsPage() {
                 borderWidth: 2,
                 tension: 0.4,
                 spanGaps: true,
-                pointRadius: 0,
+                pointRadius: 4,
+                pointBackgroundColor: '#ffffff',
+                pointBorderWidth: 2,
             }
         ]
     };

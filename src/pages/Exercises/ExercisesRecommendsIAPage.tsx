@@ -59,7 +59,7 @@ export default function ExerciseIARecommendPage() {
 
                 const aiPayload = {
                     age: age,
-                    bmi: parseFloat((calculatedBmi || 22.0).toFixed(1)),
+                    bmi: parseFloat((Number(calculatedBmi) || 22.0).toFixed(1)),
                     physical_activity_level: user.physical_activity_level || "moderate",
                     favorite_exercise_category: user.favorite_exercise_category || user.favorite_exercise_category || "Cardio"
                 };
@@ -280,7 +280,7 @@ export default function ExerciseIARecommendPage() {
 
                                 <div className="p-5 sm:p-6 bg-slate-50 border-t sm:border-t-0 sm:border-l border-slate-100 flex items-center justify-center shrink-0">
                                     <Link 
-                                        to={exercise.id.startsWith('ai-mock') ? '#' : `/exercises/${exercise.id}`}
+                                        to={`/exercise/${exercise.id}`}
                                         className={`w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#7B3FF2] ${
                                             exercise.id.startsWith('ai-mock') 
                                                 ? 'opacity-50 cursor-not-allowed' 

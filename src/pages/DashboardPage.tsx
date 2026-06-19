@@ -85,7 +85,7 @@ export default function DashboardPage() {
                 const userRes = await axios.post('/api/users/search', {
                     search: {
                         filters: [{ field: 'id', operator: '=', value: user.id }],
-                        includes: ['goals'] // On inclut les relations
+                        includes: [{ relation: 'goals' }]
                     }
                 });
 
@@ -364,7 +364,9 @@ export default function DashboardPage() {
                 borderColor: '#3b82f6',
                 borderWidth: 3,
                 tension: 0.4,
-                pointRadius: 0,
+                pointRadius: 4, // <-- Correction ajoutée ici pour afficher les points
+                pointBackgroundColor: '#ffffff',
+                pointBorderWidth: 2,
             }
         ]
     };
