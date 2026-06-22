@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 interface FoodAIResult {
     name: string;
     category: string;
-    image?: string; // Peut-être null/undefined venant du back
+    image?: string;
     calories: number;
     protein: number;
     carbohydrates: number;
@@ -124,7 +124,6 @@ export default function FoodScanIAResultPage() {
         )`
         : `conic-gradient(#f1f5f9 0% 100%)`;
 
-    // 🎯 L'IMAGE : On affiche l'image scannée en priorité, sinon l'image IA, sinon l'image par défaut.
     const displayImage = scannedImageUrl || food.image || DEFAULT_FOOD_IMAGE;
 
     return (

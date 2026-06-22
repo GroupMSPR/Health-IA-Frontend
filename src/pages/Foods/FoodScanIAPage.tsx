@@ -180,11 +180,23 @@ export default function FoodScanIAPage() {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             
-            // On récupère le résultat envoyé par le SDK-IA
-            const aiResult = response.data.data || response.data;
+            const raw = response.data.data || response.data;
+            const aiResult = {
+                name: raw.name,
+                category: raw.category || 'Snacks',
+                image: raw.image || null,
+                confidence: raw.confidence,
+                calories: raw.nutrition?.calories ?? 0,
+                protein: raw.nutrition?.protein ?? 0,
+                carbohydrates: raw.nutrition?.carbs ?? 0,
+                fat: raw.nutrition?.fat ?? 0,
+                fiber: raw.nutrition?.fiber ?? 0,
+                sugars: raw.nutrition?.sugars ?? 0,
+                sodium: raw.nutrition?.sodium ?? 0,
+                cholesterol: raw.nutrition?.cholesterol ?? 0,
+            };
 
             toast.success("Analyse terminée !");
-            // On passe aiResult ET l'URL de l'image scannée pour l'afficher sur la page suivante
             navigate('/food-scan/result', { state: { aiResult, scannedImageUrl: previewUrl } });
             
         } catch (error) {
@@ -208,7 +220,21 @@ export default function FoodScanIAPage() {
                 description: foodQuery 
             });
             
-            const aiResult = response.data.data || response.data;
+            const raw = response.data.data || response.data;
+            const aiResult = {
+                name: raw.name,
+                category: raw.category || 'Snacks',
+                image: raw.image || null,
+                confidence: raw.confidence,
+                calories: raw.nutrition?.calories ?? 0,
+                protein: raw.nutrition?.protein ?? 0,
+                carbohydrates: raw.nutrition?.carbs ?? 0,
+                fat: raw.nutrition?.fat ?? 0,
+                fiber: raw.nutrition?.fiber ?? 0,
+                sugars: raw.nutrition?.sugars ?? 0,
+                sodium: raw.nutrition?.sodium ?? 0,
+                cholesterol: raw.nutrition?.cholesterol ?? 0,
+            };
 
             toast.success("Analyse textuelle terminée !");
             navigate('/food-scan/result', { state: { aiResult, scannedImageUrl: null } });

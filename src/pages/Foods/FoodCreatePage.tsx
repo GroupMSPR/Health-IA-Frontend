@@ -21,14 +21,14 @@ interface FormState {
     name: string;
     category: string;
     image: string;
-    calories: number;
-    protein: number;
-    carbohydrates: number;
-    fat: number;
-    fiber: number;
-    sugars: number;
-    sodium: number;
-    cholesterol: number;
+    calories: string;
+    protein: string;
+    carbohydrates: string;
+    fat: string;
+    fiber: string;
+    sugars: string;
+    sodium: string;
+    cholesterol: string;
 }
 
 export default function FoodCreatePage() {
@@ -43,24 +43,22 @@ export default function FoodCreatePage() {
         name: '',
         category: 'Vegetables',
         image: '',
-        calories: 0,
-        protein: 0,
-        carbohydrates: 0,
-        fat: 0,
-        fiber: 0,
-        sugars: 0,
-        sodium: 0,
-        cholesterol: 0
+        calories: '',
+        protein: '',
+        carbohydrates: '',
+        fat: '',
+        fiber: '',
+        sugars: '',
+        sodium: '',
+        cholesterol: ''
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value, type } = e.target;
-        setForm(prev => ({
-            ...prev,
-            // Conversion automatique en nombre pour les champs de type 'number'
-            [name]: type === 'number' ? (value === '' ? 0 : Number(value)) : value
-        }));
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
     };
+
+    const parseNum = (v: string) => Math.max(0, parseFloat(v) || 0);
 
     // Gestion de l'upload d'image et conversion en Base64
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,16 +96,15 @@ export default function FoodCreatePage() {
                         attributes: {
                             name: form.name,
                             category: form.category,
-                            // Si le champ image est vide, on n'envoie pas de chaîne vide
                             image: form.image.trim() || null,
-                            calories: form.calories,
-                            protein: form.protein,
-                            carbohydrates: form.carbohydrates,
-                            fat: form.fat,
-                            fiber: form.fiber,
-                            sugars: form.sugars,
-                            sodium: form.sodium,
-                            cholesterol: form.cholesterol
+                            calories: parseNum(form.calories),
+                            protein: parseNum(form.protein),
+                            carbohydrates: parseNum(form.carbohydrates),
+                            fat: parseNum(form.fat),
+                            fiber: parseNum(form.fiber),
+                            sugars: parseNum(form.sugars),
+                            sodium: parseNum(form.sodium),
+                            cholesterol: parseNum(form.cholesterol)
                         }
                     }
                 ]
