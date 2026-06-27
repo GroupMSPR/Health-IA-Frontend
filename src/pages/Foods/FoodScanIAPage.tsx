@@ -14,7 +14,7 @@ import {
     MessageSquare
 } from 'lucide-react';
 import { toast } from 'sonner';
-import axios from '../../lib/axios'; // <-- Décommenté !
+import axios from '../../lib/axios';
 
 export default function FoodScanIAPage() {
     const navigate = useNavigate();
@@ -104,7 +104,7 @@ export default function FoodScanIAPage() {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'environment' } 
                 });
-            } catch (err) {
+            } catch (err: any) {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: true 
                 });
