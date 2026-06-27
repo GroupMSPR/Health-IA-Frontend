@@ -1,4 +1,8 @@
-name: CI React (Lint + Build)
+# ============================================================================
+#  CI — Health-IA-Frontend (React Web)
+# ============================================================================
+
+name: CI React (Lint & Build)
 
 on:
   push:
@@ -11,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout du code
         uses: actions/checkout@v4
 
