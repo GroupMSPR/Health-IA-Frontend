@@ -104,7 +104,7 @@ export default function FoodScanIAPage() {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'environment' } 
                 });
-            } catch (err: any) {
+            } catch (_err) {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: true 
                 });
