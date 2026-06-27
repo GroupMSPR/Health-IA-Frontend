@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/explicit-no-unused-vars */
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
@@ -104,7 +105,7 @@ export default function FoodScanIAPage() {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { facingMode: 'environment' } 
                 });
-            } catch (_err) {
+            } catch (err) {
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: true 
                 });
