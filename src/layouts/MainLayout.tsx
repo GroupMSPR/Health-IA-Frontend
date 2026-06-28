@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { Home, Activity, Dumbbell, Apple, Camera, User, LogOut, Lightbulb, Sparkles, Settings, ChartColumnIncreasing } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import axios from '../lib/axios';
 
 const NAV_CATEGORIES = [
     {
@@ -36,6 +38,42 @@ const NAV_CATEGORIES = [
 
 export default function MainLayout() {
     const { user, logout } = useAuth();
+
+    const [planLabel, setPlanLabel] = useState('Membre');
+
+    useEffect(() => {
+        if (!user) return;
+        let cancelled = false;
+
+        const fetchPlan = async () => {
+            try {
+                const res = await axios.post('/api/users/search', {
+                    search: {
+                        filters: [{ field: 'id', operator: '=', value: user.id }],
+                        includes: [{ relation: 'subscriptions' }],
+                    },
+                });
+                if (cancelled) return;
+
+                const profile = res.data?.data?.[0] ?? res.data?.[0] ?? null;
+                const subscriptions = (profile?.subscriptions ?? []) as { subscription_type?: string }[];
+                if (subscriptions.length) {
+                    const premium = subscriptions.find((s) => /premium/i.test(s.subscription_type ?? ''));
+                    const type = (premium ?? subscriptions[0]).subscription_type ?? '';
+                    setPlanLabel(type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Membre');
+                } else {
+                    setPlanLabel('Membre');
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de l’abonnement :', error);
+            }
+        };
+
+        fetchPlan();
+        return () => {
+            cancelled = true;
+        };
+    }, [user]);
 
     const mobileNavItems = [
         { name: "Home", path: "/dashboard", icon: Home },
@@ -106,12 +144,16 @@ export default function MainLayout() {
 
                 <div className="p-4 border-t border-slate-200">
                     <div className="flex items-center justify-center lg:justify-start gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4A6BF0] to-[#7B3FF2] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                        <Link
+                            to="/account/profile"
+                            aria-label="Voir mon profil"
+                            className="h-10 w-10 rounded-full bg-gradient-to-br from-[#4A6BF0] to-[#7B3FF2] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                        >
                             {userInitials}
-                        </div>
+                        </Link>
                         <div className="hidden lg:block flex-1 min-w-0">
                             <p className="text-sm font-bold text-slate-900 truncate">{user?.first_name} {user?.last_name}</p>
-                            <p className="text-xs text-slate-500 truncate">Premium</p>
+                            <p className="text-xs text-slate-500 truncate">{planLabel}</p>
                         </div>
                         <button onClick={logout} aria-label="Se déconnecter" className="hidden lg:flex p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                             <LogOut className="h-4 w-4" />
@@ -133,9 +175,13 @@ export default function MainLayout() {
                         </div>
                         <span className="font-bold text-lg text-slate-900">Health AI Coach</span>
                     </Link>
-                    <div className="h-8 w-8 rounded-full bg-[#7B3FF2] text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    <Link
+                        to="/account/profile"
+                        aria-label="Voir mon profil"
+                        className="h-8 w-8 rounded-full bg-[#7B3FF2] text-white flex items-center justify-center font-bold text-xs shadow-sm hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                    >
                         {userInitials}
-                    </div>
+                    </Link>
                 </header>
 
                 <div className="flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
